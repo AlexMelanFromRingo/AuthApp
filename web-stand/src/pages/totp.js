@@ -43,17 +43,17 @@ export function renderTotpPage(root) {
         </div>
       </div>
       <button id="totp-build" class="btn-primary mt-4" type="button">Згенерувати QR-код</button>
-      <p id="totp-error" class="text-red-700 text-sm mt-2 hidden"></p>
+      <p id="totp-error" class="text-error text-sm mt-2 hidden"></p>
     </section>
 
     <section id="totp-result" class="card hidden">
       <h2 class="text-lg font-semibold mb-4">Відскануйте додатком</h2>
       <div class="flex flex-col sm:flex-row gap-6 items-center">
-        <canvas id="totp-qr" class="rounded-lg border border-slate-200"></canvas>
+        <canvas id="totp-qr" class="qr-canvas"></canvas>
         <div class="flex-1 w-full">
-          <p class="text-sm text-slate-600 mb-2">Еталонний код стенду (для самоперевірки):</p>
+          <p class="text-sm text-muted mb-2">Еталонний код стенду (для самоперевірки):</p>
           <p id="totp-reference" class="text-3xl font-mono font-bold tracking-wider"></p>
-          <p id="totp-countdown" class="text-sm text-slate-500 mt-1"></p>
+          <p id="totp-countdown" class="text-sm text-muted mt-1"></p>
           <hr class="my-4" />
           <label class="field-label" for="totp-check">Введіть код із додатка</label>
           <div class="flex gap-2">

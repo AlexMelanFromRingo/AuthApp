@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Нічний варіант базової теми: прибирає білий «спалах» вікна при
+         запуску на пристроях у темному режимі; решту малює Compose -->
+    <style name="Theme.AuthApp" parent="android:Theme.Material.NoActionBar" />
+</resources>

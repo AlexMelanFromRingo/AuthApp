@@ -16,10 +16,10 @@ export function renderAboutPage(root) {
     <section class="card">
       <h2 class="text-lg font-semibold mb-3">Підтримувані алгоритми TOTP (RFC 6238)</h2>
       <table class="w-full text-sm">
-        <thead><tr class="text-left border-b border-slate-200">
+        <thead><tr class="text-left border-b border-slate-200 dark:border-slate-600">
           <th class="py-2">Алгоритм</th><th>Конструкція MAC</th><th>MAC, байтів</th><th>Усічення</th>
         </tr></thead>
-        <tbody class="divide-y divide-slate-100">
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
           <tr><td class="py-2 font-mono">SHA1</td><td>HMAC</td><td>20</td><td>RFC 4226</td></tr>
           <tr><td class="py-2 font-mono">SHA256</td><td>HMAC</td><td>32</td><td>RFC 4226</td></tr>
           <tr><td class="py-2 font-mono">SHA512</td><td>HMAC</td><td>64</td><td>RFC 4226</td></tr>
@@ -73,9 +73,9 @@ offset = MAC[L−1] mod (L−8)        // коди 9–10 цифр: 8 байті
       </p>
       <p class="text-sm mt-2">
         Стандарти:
-        <a class="text-blue-700 underline" href="https://www.rfc-editor.org/rfc/rfc4226" target="_blank" rel="noopener">RFC 4226 (HOTP)</a> •
-        <a class="text-blue-700 underline" href="https://www.rfc-editor.org/rfc/rfc6238" target="_blank" rel="noopener">RFC 6238 (TOTP)</a> •
-        <a class="text-blue-700 underline" href="https://www.rfc-editor.org/rfc/rfc6287" target="_blank" rel="noopener">RFC 6287 (OCRA)</a>
+        <a class="text-blue-700 underline dark:text-blue-400" href="https://www.rfc-editor.org/rfc/rfc4226" target="_blank" rel="noopener">RFC 4226 (HOTP)</a> •
+        <a class="text-blue-700 underline dark:text-blue-400" href="https://www.rfc-editor.org/rfc/rfc6238" target="_blank" rel="noopener">RFC 6238 (TOTP)</a> •
+        <a class="text-blue-700 underline dark:text-blue-400" href="https://www.rfc-editor.org/rfc/rfc6287" target="_blank" rel="noopener">RFC 6287 (OCRA)</a>
       </p>
     </section>`;
 }

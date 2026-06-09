@@ -37,9 +37,9 @@ export function renderOcraPage(root) {
       </div>
       <button id="ocra-provision" class="btn-primary mt-4" type="button">QR для додавання токена в додаток</button>
       <div id="ocra-provision-result" class="mt-4 hidden">
-        <canvas id="ocra-token-qr" class="rounded-lg border border-slate-200"></canvas>
+        <canvas id="ocra-token-qr" class="qr-canvas"></canvas>
       </div>
-      <p id="ocra-error" class="text-red-700 text-sm mt-2 hidden"></p>
+      <p id="ocra-error" class="text-error text-sm mt-2 hidden"></p>
     </section>
 
     <section class="card">
@@ -47,11 +47,11 @@ export function renderOcraPage(root) {
       <button id="ocra-challenge-btn" class="btn-primary" type="button">Згенерувати виклик</button>
       <div id="ocra-challenge-result" class="mt-4 hidden">
         <div class="flex flex-col sm:flex-row gap-6 items-center">
-          <canvas id="ocra-challenge-qr" class="rounded-lg border border-slate-200"></canvas>
+          <canvas id="ocra-challenge-qr" class="qr-canvas"></canvas>
           <div class="flex-1 w-full">
-            <p class="text-sm text-slate-600">Виклик (Q): <span id="ocra-q" class="font-mono font-bold"></span></p>
-            <p class="text-sm text-slate-600">Дійсний: <span id="ocra-ttl"></span></p>
-            <p class="text-sm text-slate-500 mt-1">Відскануйте QR на екрані OCRA додатка.</p>
+            <p class="text-sm text-muted">Виклик (Q): <span id="ocra-q" class="font-mono font-bold"></span></p>
+            <p class="text-sm text-muted">Дійсний: <span id="ocra-ttl"></span></p>
+            <p class="text-sm text-muted mt-1">Відскануйте QR на екрані OCRA додатка.</p>
           </div>
         </div>
       </div>
