@@ -119,7 +119,7 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 - [x] T029 [US3] Реалізувати екран `android-app/app/src/main/kotlin/ua/authapp/ui/OcraScreen.kt`: сканування QR-виклику (повторне використання T016), парсинг `authapp://ocra-challenge` у `core-crypto/codec/OtpUri.kt`, вибір токена при неоднозначності за label (FR-012), показ відгуку великим шрифтом + копіювання по тапу
 - [x] T030 [P] [US3] Реалізувати `web-stand/src/crypto/ocra.js` + тести в `web-stand/tests/ocra.test.js` на тих самих векторах
 - [x] T031 [US3] Реалізувати сторінку-симулятор `web-stand/src/pages/ocra.js`: конфігурація suite+секрет, провіжининг-QR `authapp://ocra-token`, генерація виклику (CSPRNG QN08, cid, exp=120 с) у QR, валідація відгуку (вікно ±1 крок для T-профілів), стани ISSUED→VALIDATED/EXPIRED у пам'яті сесії, відхилення повторної валідації (FR-014, FR-023)
-- [ ] T032 [US3] Прогнати сценарії приймання US3 (spec.md) + сценарій 3 quickstart.md, зафіксувати в `specs/001-totp-ocra-auth/checklists/us3-validation.md`
+- [x] T032 [US3] Прогнати сценарії приймання US3 (spec.md) + сценарій 3 quickstart.md, зафіксувати в `specs/001-totp-ocra-auth/checklists/us3-validation.md`
 
 **Checkpoint**: повний цикл OCRA працює; вектори RFC 6287 зелені в обох реалізаціях
 

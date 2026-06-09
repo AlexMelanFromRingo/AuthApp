@@ -148,40 +148,53 @@ private fun TokenCard(
             .fillMaxWidth()
             .clickable(enabled = row.code != null) { row.code?.let(onCopy) },
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(row.token.issuer, style = MaterialTheme.typography.titleMedium)
-                if (row.token.account.isNotBlank()) {
-                    Text(row.token.account, style = MaterialTheme.typography.bodySmall)
+        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+            // Шапка: назва + дії
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(row.token.issuer, style = MaterialTheme.typography.titleMedium)
+                    if (row.token.account.isNotBlank()) {
+                        Text(row.token.account, style = MaterialTheme.typography.bodySmall)
+                    }
                 }
-                when (row.token.type) {
-                    TokenType.TOTP -> Text(
-                        // Групуємо цифри для читабельності: 123 456
-                        text = row.code.orEmpty().chunked(3).joinToString(" "),
+                IconButton(onClick = onRename) {
+                    Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.token_rename))
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.token_delete))
+                }
+            }
+            when (row.token.type) {
+                TokenType.TOTP -> {
+                    // Код на всю ширину — навіть 10 цифр в один рядок
+                    Text(
+                        text = groupCode(row.code.orEmpty()),
                         style = MaterialTheme.typography.headlineMedium,
                         fontFamily = FontFamily.Monospace,
                         color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
                     )
-                    TokenType.OCRA -> Text(
-                        text = row.token.ocraSuite.orEmpty(),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+                    // Залишок періоду — окремим рядком знизу
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 6.dp),
+                    ) {
+                        CircularProgressIndicator(
+                            progress = { row.secondsLeft.toFloat() / row.token.period },
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.5.dp,
+                        )
+                        Text(
+                            text = stringResource(R.string.token_seconds_left, row.secondsLeft),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
                 }
-            }
-            if (row.token.type == TokenType.TOTP) {
-                CircularProgressIndicator(
-                    progress = { row.secondsLeft.toFloat() / row.token.period },
-                    modifier = Modifier.size(36.dp),
+                TokenType.OCRA -> Text(
+                    text = row.token.ocraSuite.orEmpty(),
+                    style = MaterialTheme.typography.bodySmall,
                 )
-            }
-            IconButton(onClick = onRename) {
-                Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.token_rename))
-            }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.token_delete))
             }
         }
     }

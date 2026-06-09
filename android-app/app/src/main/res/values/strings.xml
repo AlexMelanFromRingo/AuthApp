@@ -64,6 +64,10 @@
     <string name="deactivate_confirm">Так, знищити</string>
     <string name="deactivate_done">Сховище деактивовано. Секрети знищено.</string>
 
+    <!-- Про додаток -->
+    <string name="about_developer">Розробник: Alex Melan</string>
+    <string name="about_github_url" translatable="false">https://github.com/AlexMelanFromRingo/AuthApp</string>
+
     <!-- Загальне -->
     <string name="action_cancel">Скасувати</string>
     <string name="action_ok">Гаразд</string>

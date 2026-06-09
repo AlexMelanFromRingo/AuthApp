@@ -125,7 +125,7 @@ fun OcraScreen(onBack: () -> Unit) {
             ) {
                 Text(stringResource(R.string.ocra_response_label), style = MaterialTheme.typography.titleMedium)
                 Text(
-                    text = response.orEmpty().chunked(4).joinToString(" "),
+                    text = groupCode(response.orEmpty()),
                     style = MaterialTheme.typography.displayMedium,
                     fontFamily = FontFamily.Monospace,
                     color = MaterialTheme.colorScheme.primary,

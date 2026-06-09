@@ -1,17 +1,21 @@
 package ua.authapp.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.core.net.toUri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,11 +51,12 @@ fun UnlockScreen(onUnlocked: () -> Unit) {
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
         Icon(Icons.Filled.Lock, contentDescription = null)
         Spacer(Modifier.height(16.dp))
         Text(
@@ -77,6 +82,21 @@ fun UnlockScreen(onUnlocked: () -> Unit) {
             }) {
                 Text(stringResource(R.string.unlock_button))
             }
+        }
+        }
+
+        // Підпис розробника з посиланням на репозиторій
+        val githubUrl = stringResource(R.string.about_github_url)
+        TextButton(
+            onClick = {
+                activity.startActivity(Intent(Intent.ACTION_VIEW, githubUrl.toUri()))
+            },
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.about_developer) + " • GitHub",
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
     }
 }
