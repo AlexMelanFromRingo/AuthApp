@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Логотип: щит із шістьма крапками — 6-значний одноразовий код -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Щит (біла заливка) -->
+    <path
+        android:pathData="M54,30 L71,37 V53 C71,64.5 63.5,72.5 54,78 C44.5,72.5 37,64.5 37,53 V37 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Шість крапок коду (колір тла «прорізає» щит) -->
+    <path android:pathData="M46.5,51 m-2.7,0 a2.7,2.7 0 1,1 5.4,0 a2.7,2.7 0 1,1 -5.4,0" android:fillColor="#1B5E9E" />
+    <path android:pathData="M54,51 m-2.7,0 a2.7,2.7 0 1,1 5.4,0 a2.7,2.7 0 1,1 -5.4,0" android:fillColor="#1B5E9E" />
+    <path android:pathData="M61.5,51 m-2.7,0 a2.7,2.7 0 1,1 5.4,0 a2.7,2.7 0 1,1 -5.4,0" android:fillColor="#1B5E9E" />
+    <path android:pathData="M46.5,60 m-2.7,0 a2.7,2.7 0 1,1 5.4,0 a2.7,2.7 0 1,1 -5.4,0" android:fillColor="#1B5E9E" />
+    <path android:pathData="M54,60 m-2.7,0 a2.7,2.7 0 1,1 5.4,0 a2.7,2.7 0 1,1 -5.4,0" android:fillColor="#1B5E9E" />
+    <path android:pathData="M61.5,60 m-2.7,0 a2.7,2.7 0 1,1 5.4,0 a2.7,2.7 0 1,1 -5.4,0" android:fillColor="#1B5E9E" />
+</vector>
