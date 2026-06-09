@@ -11,7 +11,12 @@ import kotlinx.serialization.json.Json
  * майстер-ключ AES-256-GCM живе в Android Keystore і не покидає апаратного
  * сховища. Біометричний бар'єр діє на рівні застосунку (BiometricGate), а не
  * ключа — інакше зміна реєстрації біометрії безповоротно знищила б токени.
+ *
+ * Бібліотеку security-crypto переведено в режим супроводу (deprecated) —
+ * прийнятий ризик за рішенням R4 research.md: API стабільний, явна вимога
+ * замовника; міграція на DataStore + власний Keystore-шар — поза межами версії.
  */
+@Suppress("DEPRECATION")
 class TokenStore(context: Context) {
 
     private val json = Json { ignoreUnknownKeys = true }
