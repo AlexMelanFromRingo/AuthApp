@@ -95,10 +95,10 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Реалізувати дзеркало ядра `web-stand/src/crypto/mac.js`, `truncation.js`, `totp.js` на @noble/hashes — побітова відповідність contracts/crypto-core.md (обидва правила усічення, keyed/HMAC конструкції)
-- [ ] T022 [P] [US2] Написати тести `web-stand/tests/crypto.test.js` (Vitest): читання `../shared/test-vectors/{totp,truncation}.json`, 100% кейсів зелені (SC-001)
-- [ ] T023 [US2] Реалізувати генерацію QR: `web-stand/src/qr.js` (обгортка пакета qrcode) + сторінка `web-stand/src/pages/totp.js` — форма параметрів (7 алгоритмів, digits 6–10, period, секрет: ввести/згенерувати CSPRNG), вибір схеми otpauth:///authapp:// за алгоритмом (contracts §1)
-- [ ] T024 [US2] Реалізувати валідатор кодів на сторінці TOTP: введення коду з додатка, вікно ±1 період, чіткий результат «збігається/не збігається» + поточний еталонний код для самоперевірки (FR-022); вся локалізація українською (FR-024)
+- [x] T021 [P] [US2] Реалізувати дзеркало ядра `web-stand/src/crypto/mac.js`, `truncation.js`, `totp.js` на @noble/hashes — побітова відповідність contracts/crypto-core.md (обидва правила усічення, keyed/HMAC конструкції)
+- [x] T022 [P] [US2] Написати тести `web-stand/tests/crypto.test.js` (Vitest): читання `../shared/test-vectors/{totp,truncation}.json`, 100% кейсів зелені (SC-001)
+- [x] T023 [US2] Реалізувати генерацію QR: `web-stand/src/qr.js` (обгортка пакета qrcode) + сторінка `web-stand/src/pages/totp.js` — форма параметрів (7 алгоритмів, digits 6–10, period, секрет: ввести/згенерувати CSPRNG), вибір схеми otpauth:///authapp:// за алгоритмом (contracts §1)
+- [x] T024 [US2] Реалізувати валідатор кодів на сторінці TOTP: введення коду з додатка, вікно ±1 період, чіткий результат «збігається/не збігається» + поточний еталонний код для самоперевірки (FR-022); вся локалізація українською (FR-024)
 - [ ] T025 [US2] Розгорнути на GitHub Pages (workflow з T006), перевірити сценарії 2 і 6 quickstart.md у Chrome та Firefox (SC-004, SC-008), зафіксувати в `specs/001-totp-ocra-auth/checklists/us2-validation.md`
 
 **Checkpoint**: повний демо-цикл TOTP для всіх 7 алгоритмів працює
