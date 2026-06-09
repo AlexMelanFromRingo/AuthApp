@@ -40,12 +40,12 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 
 **Purpose**: каркас монорепозиторію, збірка обох частин
 
-- [ ] T001 Створити структуру монорепозиторію: каталоги `android-app/`, `web-stand/`, `shared/test-vectors/`, кореневий `README.md` українською (огляд, посилання на specs/)
-- [ ] T002 Ініціалізувати Gradle: `android-app/settings.gradle.kts` (модулі `:core-crypto`, `:app`), `android-app/gradle/libs.versions.toml` (Kotlin 2.x, AGP, Compose BOM/Material3, androidx.biometric, security-crypto, CameraX, ML Kit barcode-scanning, Bouncy Castle bcprov-jdk18on, kotlinx.serialization, JUnit)
-- [ ] T003 [P] Створити модуль ядра: `android-app/core-crypto/build.gradle.kts` — чистий Kotlin/JVM (kotlin("jvm")), залежності BC + kotlinx-serialization-json + тести; без Android SDK
-- [ ] T004 [P] Створити каркас додатка: `android-app/app/build.gradle.kts` (minSdk 26, targetSdk 35, Compose), `AndroidManifest.xml` (`android:allowBackup="false"`, дозвіл CAMERA), `app/src/main/kotlin/ua/authapp/MainActivity.kt` + тема Material 3 у `ui/theme/` (динамічні кольори API 31+ з фолбеком), `res/values/strings.xml` українською
-- [ ] T005 [P] Ініціалізувати Web-стенд: `web-stand/package.json` (vite, tailwindcss, @noble/hashes, qrcode, vitest), `web-stand/vite.config.js`, `web-stand/index.html` — каркас трьох сторінок українською, Tailwind підключено
-- [ ] T006 [P] Налаштувати CI: `.github/workflows/ci.yml` (Gradle-тести core-crypto + Vitest web-stand на push) та `.github/workflows/pages.yml` (збірка `web-stand/dist` → GitHub Pages)
+- [x] T001 Створити структуру монорепозиторію: каталоги `android-app/`, `web-stand/`, `shared/test-vectors/`, кореневий `README.md` українською (огляд, посилання на specs/)
+- [x] T002 Ініціалізувати Gradle: `android-app/settings.gradle.kts` (модулі `:core-crypto`, `:app`), `android-app/gradle/libs.versions.toml` (Kotlin 2.x, AGP, Compose BOM/Material3, androidx.biometric, security-crypto, CameraX, ML Kit barcode-scanning, Bouncy Castle bcprov-jdk18on, kotlinx.serialization, JUnit)
+- [x] T003 [P] Створити модуль ядра: `android-app/core-crypto/build.gradle.kts` — чистий Kotlin/JVM (kotlin("jvm")), залежності BC + kotlinx-serialization-json + тести; без Android SDK
+- [x] T004 [P] Створити каркас додатка: `android-app/app/build.gradle.kts` (minSdk 26, targetSdk 35, Compose), `AndroidManifest.xml` (`android:allowBackup="false"`, дозвіл CAMERA), `app/src/main/kotlin/ua/authapp/MainActivity.kt` + тема Material 3 у `ui/theme/` (динамічні кольори API 31+ з фолбеком), `res/values/strings.xml` українською
+- [x] T005 [P] Ініціалізувати Web-стенд: `web-stand/package.json` (vite, tailwindcss, @noble/hashes, qrcode, vitest), `web-stand/vite.config.js`, `web-stand/index.html` — каркас трьох сторінок українською, Tailwind підключено
+- [x] T006 [P] Налаштувати CI: `.github/workflows/ci.yml` (Gradle-тести core-crypto + Vitest web-stand на push) та `.github/workflows/pages.yml` (збірка `web-stand/dist` → GitHub Pages)
 
 ---
 
@@ -55,15 +55,15 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 
 **⚠️ CRITICAL**: користувацькі історії не починати до завершення цієї фази
 
-- [ ] T007 Написати референс-генератор векторів `shared/test-vectors/generate.py` (Python: hashlib + blake3): TOTP для 7 алгоритмів × digits 6/8/9/10, вектори узагальненого усічення (MAC→offset→код), OCRA-вектори RFC 6287 Appendix C; згенерувати і закомітити `totp.json`, `truncation.json`, `ocra.json` (формат — contracts/crypto-core.md)
-- [ ] T008 [P] Реалізувати словник алгоритмів і MAC-фабрику в `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/mac/MacFactory.kt`: HMAC-SHA1/256/512 через javax.crypto, HMAC-SHA3-256 + keyed Blake2s/Blake2b/Blake3 через BC, конвенція довгого ключа (FR-008)
-- [ ] T009 [P] Реалізувати усічення в `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/truncation/DynamicTruncation.kt`: RFC 4226 (нібл) для стандартних, узагальнене `mod (L−4)` / 8 байтів для digits 9–10 для розширених (contracts/crypto-core.md), включно з інваріантом тотожності при L=20
-- [ ] T010 Реалізувати TOTP у `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/totp/Totp.kt`: T0=0, period 15–120, digits 6–10, провідні нулі (залежить від T008, T009)
-- [ ] T011 [P] Реалізувати кодеки в `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/codec/`: `Base32.kt` (RFC 4648 без паддінгу) і `OtpUri.kt` — парсинг/серіалізація `otpauth://totp`, `authapp://totp`, `authapp://ocra-token` з валідацією і україномовними помилками (contracts/qr-uri-schemes.md §1–2, FR-006)
-- [ ] T012 Написати векторні тести ядра `android-app/core-crypto/src/test/kotlin/ua/authapp/crypto/VectorTest.kt`: читання `shared/test-vectors/{totp,truncation}.json`, 100% кейсів зелені, 0 skipped (SC-001)
-- [ ] T013 [P] Реалізувати біометричний бар'єр: `android-app/app/src/main/kotlin/ua/authapp/biometric/BiometricGate.kt` (BiometricPrompt, BIOMETRIC_STRONG, повторний запит при поверненні з фону) + екран `ui/UnlockScreen.kt`; обробка «біометрія недоступна/не налаштована» з поясненням (FR-002, edge case)
-- [ ] T014 [P] Реалізувати сховище: `android-app/app/src/main/kotlin/ua/authapp/storage/Token.kt` (модель за data-model.md) і `storage/TokenStore.kt` — EncryptedSharedPreferences з майстер-ключем Keystore AES-256-GCM (без setUserAuthenticationRequired, R4), CRUD + виявлення дублікатів; JVM-тести парсингу/серіалізації в `app/src/test/`
-- [ ] T015 Зібрати навігаційний каркас `android-app/app/src/main/kotlin/ua/authapp/ui/AppNav.kt`: Unlock → TokenList (заглушка), `FLAG_SECURE` на вікні активності (FR-003)
+- [x] T007 Написати референс-генератор векторів `shared/test-vectors/generate.py` (Python: hashlib + blake3): TOTP для 7 алгоритмів × digits 6/8/9/10, вектори узагальненого усічення (MAC→offset→код), OCRA-вектори RFC 6287 Appendix C; згенерувати і закомітити `totp.json`, `truncation.json`, `ocra.json` (формат — contracts/crypto-core.md)
+- [x] T008 [P] Реалізувати словник алгоритмів і MAC-фабрику в `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/mac/MacFactory.kt`: HMAC-SHA1/256/512 через javax.crypto, HMAC-SHA3-256 + keyed Blake2s/Blake2b/Blake3 через BC, конвенція довгого ключа (FR-008)
+- [x] T009 [P] Реалізувати усічення в `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/truncation/DynamicTruncation.kt`: RFC 4226 (нібл) для стандартних, узагальнене `mod (L−4)` / 8 байтів для digits 9–10 для розширених (contracts/crypto-core.md), включно з інваріантом тотожності при L=20
+- [x] T010 Реалізувати TOTP у `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/totp/Totp.kt`: T0=0, period 15–120, digits 6–10, провідні нулі (залежить від T008, T009)
+- [x] T011 [P] Реалізувати кодеки в `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/codec/`: `Base32.kt` (RFC 4648 без паддінгу) і `OtpUri.kt` — парсинг/серіалізація `otpauth://totp`, `authapp://totp`, `authapp://ocra-token` з валідацією і україномовними помилками (contracts/qr-uri-schemes.md §1–2, FR-006)
+- [x] T012 Написати векторні тести ядра `android-app/core-crypto/src/test/kotlin/ua/authapp/crypto/VectorTest.kt`: читання `shared/test-vectors/{totp,truncation}.json`, 100% кейсів зелені, 0 skipped (SC-001)
+- [x] T013 [P] Реалізувати біометричний бар'єр: `android-app/app/src/main/kotlin/ua/authapp/biometric/BiometricGate.kt` (BiometricPrompt, BIOMETRIC_STRONG, повторний запит при поверненні з фону) + екран `ui/UnlockScreen.kt`; обробка «біометрія недоступна/не налаштована» з поясненням (FR-002, edge case)
+- [x] T014 [P] Реалізувати сховище: `android-app/app/src/main/kotlin/ua/authapp/storage/Token.kt` (модель за data-model.md) і `storage/TokenStore.kt` — EncryptedSharedPreferences з майстер-ключем Keystore AES-256-GCM (без setUserAuthenticationRequired, R4), CRUD + виявлення дублікатів; JVM-тести парсингу/серіалізації в `app/src/test/`
+- [x] T015 Зібрати навігаційний каркас `android-app/app/src/main/kotlin/ua/authapp/ui/AppNav.kt`: Unlock → TokenList (заглушка), `FLAG_SECURE` на вікні активності (FR-003)
 
 **Checkpoint**: `./gradlew :core-crypto:test` зелений на всіх векторах; додаток запускається лише через біометрію
 

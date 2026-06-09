@@ -1,0 +1,117 @@
+{
+ "cases": [
+  {
+   "rule": "rfc4226",
+   "alg": "SHA1",
+   "macHex": "e96bba8fef13d07b1c0e87d7877162404e961710",
+   "digits": 6,
+   "expectedOffset": 0,
+   "expected": "667791"
+  },
+  {
+   "rule": "rfc4226",
+   "alg": "SHA1",
+   "macHex": "e96bba8fef13d07b1c0e87d7877162404e961710",
+   "digits": 8,
+   "expectedOffset": 0,
+   "expected": "68667791"
+  },
+  {
+   "rule": "rfc4226",
+   "alg": "SHA256",
+   "macHex": "5009c52dbf8e9044a60ede6d3b4d5335afcb55c348f4a3c9a35983a9817a1e34",
+   "digits": 6,
+   "expectedOffset": 4,
+   "expected": "307652"
+  },
+  {
+   "rule": "rfc4226",
+   "alg": "SHA256",
+   "macHex": "5009c52dbf8e9044a60ede6d3b4d5335afcb55c348f4a3c9a35983a9817a1e34",
+   "digits": 8,
+   "expectedOffset": 4,
+   "expected": "66307652"
+  },
+  {
+   "rule": "rfc4226",
+   "alg": "SHA512",
+   "macHex": "55e5820ff5cee450fa7d7f6c39d8b8fee5b729ec27d34bda7b00e951b8497de1c1b34afac7ffc20a81266bb0af22f6008679c847f34b7094157e420ed365b343",
+   "digits": 6,
+   "expectedOffset": 3,
+   "expected": "767524"
+  },
+  {
+   "rule": "rfc4226",
+   "alg": "SHA512",
+   "macHex": "55e5820ff5cee450fa7d7f6c39d8b8fee5b729ec27d34bda7b00e951b8497de1c1b34afac7ffc20a81266bb0af22f6008679c847f34b7094157e420ed365b343",
+   "digits": 8,
+   "expectedOffset": 3,
+   "expected": "67767524"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2S-256",
+   "macHex": "5009c52dbf8e9044a60ede6d3b4d5335afcb55c348f4a3c9a35983a9817a1e34",
+   "digits": 6,
+   "expectedOffset": 24,
+   "expected": "068969"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2S-256",
+   "macHex": "5009c52dbf8e9044a60ede6d3b4d5335afcb55c348f4a3c9a35983a9817a1e34",
+   "digits": 8,
+   "expectedOffset": 24,
+   "expected": "93068969"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2S-256",
+   "macHex": "5009c52dbf8e9044a60ede6d3b4d5335afcb55c348f4a3c9a35983a9817a1e34",
+   "digits": 9,
+   "expectedOffset": 4,
+   "expected": "600541293"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2S-256",
+   "macHex": "5009c52dbf8e9044a60ede6d3b4d5335afcb55c348f4a3c9a35983a9817a1e34",
+   "digits": 10,
+   "expectedOffset": 4,
+   "expected": "5600541293"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2B-512",
+   "macHex": "55e5820ff5cee450fa7d7f6c39d8b8fee5b729ec27d34bda7b00e951b8497de1c1b34afac7ffc20a81266bb0af22f6008679c847f34b7094157e420ed365b343",
+   "digits": 6,
+   "expectedOffset": 7,
+   "expected": "593407"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2B-512",
+   "macHex": "55e5820ff5cee450fa7d7f6c39d8b8fee5b729ec27d34bda7b00e951b8497de1c1b34afac7ffc20a81266bb0af22f6008679c847f34b7094157e420ed365b343",
+   "digits": 8,
+   "expectedOffset": 7,
+   "expected": "58593407"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2B-512",
+   "macHex": "55e5820ff5cee450fa7d7f6c39d8b8fee5b729ec27d34bda7b00e951b8497de1c1b34afac7ffc20a81266bb0af22f6008679c847f34b7094157e420ed365b343",
+   "digits": 9,
+   "expectedOffset": 11,
+   "expected": "830774057"
+  },
+  {
+   "rule": "generalized",
+   "alg": "BLAKE2B-512",
+   "macHex": "55e5820ff5cee450fa7d7f6c39d8b8fee5b729ec27d34bda7b00e951b8497de1c1b34afac7ffc20a81266bb0af22f6008679c847f34b7094157e420ed365b343",
+   "digits": 10,
+   "expectedOffset": 11,
+   "expected": "8830774057"
+  }
+ ],
+ "invariantNote": "для L=20 і digits<=8 узагальнене правило збігається з RFC 4226"
+}
