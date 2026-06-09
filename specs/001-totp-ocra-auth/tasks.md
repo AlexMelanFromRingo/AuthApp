@@ -77,10 +77,10 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Реалізувати сканер `android-app/app/src/main/kotlin/ua/authapp/scanner/QrScanner.kt`: CameraX Preview + ML Kit barcode analyzer як composable; обробка відмови в дозволі камери з поясненням (edge case)
-- [ ] T017 [US1] Реалізувати екран додавання `android-app/app/src/main/kotlin/ua/authapp/ui/AddTokenScreen.kt`: сканування → парсинг OtpUri (T011) → україномовні помилки для непідтримуваних QR → діалог дубліката «замінити чи додати окремо» → збереження в TokenStore
-- [ ] T018 [US1] Реалізувати головний екран `android-app/app/src/main/kotlin/ua/authapp/ui/TokenListScreen.kt`: список токенів (M3 Cards), оновлення кодів щосекунди, круговий індикатор залишку періоду, тап → буфер обміну + сповіщення «Код скопійовано» (FR-010/011), перейменування і видалення з підтвердженням (FR-004)
-- [ ] T019 [US1] Реалізувати `android-app/app/src/main/kotlin/ua/authapp/ui/TokenListViewModel.kt`: генерація кодів через :core-crypto поза головним потоком, тік без пропусків (<50 мс на код), жодних секретів/кодів у логах (FR-003)
+- [x] T016 [US1] Реалізувати сканер `android-app/app/src/main/kotlin/ua/authapp/scanner/QrScanner.kt`: CameraX Preview + ML Kit barcode analyzer як composable; обробка відмови в дозволі камери з поясненням (edge case)
+- [x] T017 [US1] Реалізувати екран додавання `android-app/app/src/main/kotlin/ua/authapp/ui/AddTokenScreen.kt`: сканування → парсинг OtpUri (T011) → україномовні помилки для непідтримуваних QR → діалог дубліката «замінити чи додати окремо» → збереження в TokenStore
+- [x] T018 [US1] Реалізувати головний екран `android-app/app/src/main/kotlin/ua/authapp/ui/TokenListScreen.kt`: список токенів (M3 Cards), оновлення кодів щосекунди, круговий індикатор залишку періоду, тап → буфер обміну + сповіщення «Код скопійовано» (FR-010/011), перейменування і видалення з підтвердженням (FR-004)
+- [x] T019 [US1] Реалізувати `android-app/app/src/main/kotlin/ua/authapp/ui/TokenListViewModel.kt`: генерація кодів через :core-crypto поза головним потоком, тік без пропусків (<50 мс на код), жодних секретів/кодів у логах (FR-003)
 - [ ] T020 [US1] Прогнати сценарії приймання US1 (spec.md): біометрія при першому запуску, токен SHA-1 6 цифр із вектора, BLAKE3 9 цифр, копіювання по тапу, збереження після перезавантаження — зафіксувати результати в `specs/001-totp-ocra-auth/checklists/us1-validation.md`
 
 **Checkpoint**: MVP готовий — додаток самодостатній як аутентифікатор
