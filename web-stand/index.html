@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Стенд перевірки TOTP/OCRA</title>
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen">
+  <header class="bg-slate-900 text-white shadow">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between flex-wrap gap-2">
+      <h1 class="text-xl font-bold">Стенд перевірки алгоритмів автентифікації</h1>
+      <nav class="flex gap-1" id="nav">
+        <button data-page="totp" class="nav-btn">TOTP</button>
+        <button data-page="ocra" class="nav-btn">OCRA</button>
+        <button data-page="about" class="nav-btn">Довідка</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="max-w-4xl mx-auto px-4 py-6"></main>
+
+  <footer class="max-w-4xl mx-auto px-4 py-6 text-sm text-slate-500">
+    Дипломна робота бакалавра з кібербезпеки. Усі обчислення виконуються
+    локально у вашому браузері; секрети нікуди не передаються і зникають
+    після перезавантаження сторінки.
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

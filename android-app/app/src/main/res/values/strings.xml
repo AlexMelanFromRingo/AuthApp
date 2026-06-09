@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Автентифікатор</string>
+
+    <!-- Розблокування -->
+    <string name="unlock_title">Підтвердьте особу</string>
+    <string name="unlock_subtitle">Доступ до токенів лише після біометричної перевірки</string>
+    <string name="unlock_button">Розблокувати</string>
+    <string name="unlock_error_no_hardware">На цьому пристрої немає біометричного сенсора. Додаток недоступний.</string>
+    <string name="unlock_error_not_enrolled">Біометрію не налаштовано. Додайте відбиток пальця або обличчя в налаштуваннях пристрою і поверніться.</string>
+    <string name="unlock_error_unavailable">Біометрія тимчасово недоступна. Спробуйте пізніше.</string>
+
+    <!-- Список токенів -->
+    <string name="tokens_title">Мої токени</string>
+    <string name="tokens_empty">Поки що немає жодного токена. Додайте перший, відсканувавши QR-код.</string>
+    <string name="token_copied">Код скопійовано</string>
+    <string name="token_add">Додати токен</string>
+    <string name="token_rename">Перейменувати</string>
+    <string name="token_delete">Видалити</string>
+    <string name="token_delete_confirm">Видалити токен «%1$s»? Цю дію неможливо скасувати.</string>
+    <string name="token_seconds_left">Залишилося %1$d с</string>
+
+    <!-- Додавання / сканування -->
+    <string name="scan_title">Сканування QR-коду</string>
+    <string name="scan_permission_rationale">Камера потрібна лише для сканування QR-кодів із параметрами токенів. Зображення нікуди не передаються.</string>
+    <string name="scan_permission_denied">Без доступу до камери додати токен через QR неможливо. Надайте дозвіл у налаштуваннях.</string>
+    <string name="scan_invalid_qr">QR-код не розпізнано або формат не підтримується</string>
+    <string name="add_duplicate_title">Такий токен уже існує</string>
+    <string name="add_duplicate_message">Токен з тими самими параметрами вже збережено. Замінити його чи додати окремий запис?</string>
+    <string name="add_duplicate_replace">Замінити</string>
+    <string name="add_duplicate_keep_both">Додати окремо</string>
+    <string name="add_success">Токен «%1$s» додано</string>
+
+    <!-- OCRA -->
+    <string name="ocra_title">OCRA: виклик-відповідь</string>
+    <string name="ocra_scan_hint">Відскануйте QR-код виклику зі стенда або сервера</string>
+    <string name="ocra_response_label">Ваш відгук</string>
+    <string name="ocra_no_token">Немає OCRA-токена, що відповідає цьому виклику. Спершу додайте токен.</string>
+    <string name="ocra_pick_token">Оберіть токен для відповіді</string>
+    <string name="ocra_copied">Відгук скопійовано</string>
+
+    <!-- Міграція -->
+    <string name="migration_title">Перенесення токенів</string>
+    <string name="export_title">Експорт на інший пристрій</string>
+    <string name="export_select_tokens">Оберіть токени для перенесення</string>
+    <string name="export_passphrase">Парольна фраза</string>
+    <string name="export_passphrase_repeat">Повторіть парольну фразу</string>
+    <string name="export_passphrase_mismatch">Парольні фрази не збігаються</string>
+    <string name="export_frame_counter">Кадр %1$d із %2$d</string>
+    <string name="export_share_file">Поділитися файлом</string>
+    <string name="import_title">Імпорт з іншого пристрою</string>
+    <string name="import_progress">Отримано кадрів: %1$d із %2$d</string>
+    <string name="import_missing_frames">Відсутні кадри: %1$s. Відскануйте їх повторно.</string>
+    <string name="import_wrong_passphrase">Неправильна парольна фраза або пошкоджений пакет</string>
+    <string name="import_success">Імпортовано токенів: %1$d. Покажіть квитанцію на старому пристрої.</string>
+    <string name="receipt_title">Квитанція імпорту</string>
+    <string name="receipt_scan">Сканувати квитанцію</string>
+    <string name="receipt_verified">Квитанцію підтверджено. Можна безпечно деактивувати токени на цьому пристрої.</string>
+    <string name="receipt_invalid">Квитанція не відповідає цьому експорту</string>
+    <string name="deactivate_title">Деактивація сховища</string>
+    <string name="deactivate_warning">УВАГА: всі секрети на цьому пристрої буде знищено безповоротно. Токени перестануть генерувати коди. Продовжити?</string>
+    <string name="deactivate_force_warning">Квитанцію імпорту НЕ підтверджено. Якщо перенесення не завершилось, ви втратите всі токени назавжди. Ви впевнені?</string>
+    <string name="deactivate_confirm">Так, знищити</string>
+    <string name="deactivate_done">Сховище деактивовано. Секрети знищено.</string>
+
+    <!-- Загальне -->
+    <string name="action_cancel">Скасувати</string>
+    <string name="action_ok">Гаразд</string>
+    <string name="action_next">Далі</string>
+    <string name="action_back">Назад</string>
+</resources>

@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* Спільні утиліти інтерфейсу стенду */
+.nav-btn {
+  @apply px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition;
+}
+.nav-btn.active {
+  @apply bg-slate-700 text-white;
+}
+.card {
+  @apply bg-white rounded-2xl shadow p-6 mb-6;
+}
+.field-label {
+  @apply block text-sm font-medium text-slate-700 mb-1;
+}
+.field-input {
+  @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+.btn-primary {
+  @apply bg-blue-700 hover:bg-blue-800 text-white font-medium rounded-lg px-4 py-2 text-sm transition disabled:opacity-50;
+}
+.btn-secondary {
+  @apply bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium rounded-lg px-4 py-2 text-sm transition;
+}
+.result-ok {
+  @apply bg-green-100 text-green-900 border border-green-300 rounded-lg px-4 py-3;
+}
+.result-fail {
+  @apply bg-red-100 text-red-900 border border-red-300 rounded-lg px-4 py-3;
+}
