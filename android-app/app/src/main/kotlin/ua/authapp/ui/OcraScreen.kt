@@ -181,9 +181,20 @@ fun OcraScreen(onBack: () -> Unit) {
                         try {
                             when (val parsed = OtpUri.parse(raw)) {
                                 is ParsedQr.OcraChallenge -> onChallengeScanned(parsed)
+                                // Користувач показав QR провіжинингу (Крок 1
+                                // на стенді) — додаємо токен прямо тут, без
+                                // переходу на екран «Додати токен»
+                                is ParsedQr.OcraToken -> {
+                                    val token = Token.fromParsed(parsed)
+                                    val existing = store.findDuplicate(token)
+                                    if (existing == null) store.save(token)
+                                    error = context.getString(R.string.ocra_token_added, token.issuer)
+                                }
                                 else -> error = context.getString(R.string.scan_invalid_qr)
                             }
                         } catch (e: UriFormatException) {
+                            error = e.message
+                        } catch (e: IllegalArgumentException) {
                             error = e.message
                         }
                     },

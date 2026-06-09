@@ -38,6 +38,10 @@ export function renderOcraPage(root) {
       <button id="ocra-provision" class="btn-primary mt-4" type="button">QR для додавання токена в додаток</button>
       <div id="ocra-provision-result" class="mt-4 hidden">
         <canvas id="ocra-token-qr" class="qr-canvas"></canvas>
+        <p class="text-sm text-muted mt-2">
+          Відскануйте цей QR просто на екрані OCRA додатка — токен додасться
+          автоматично. Після цього переходьте до кроку 2.
+        </p>
       </div>
       <p id="ocra-error" class="text-error text-sm mt-2 hidden"></p>
     </section>

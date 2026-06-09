@@ -146,7 +146,6 @@ fun ImportScreen(onBack: () -> Unit) {
                     Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
                 }
                 QrScanner(
-                    continuous = true,
                     onResult = { raw ->
                         try {
                             error = null

@@ -38,6 +38,7 @@
     <string name="ocra_no_token">Немає OCRA-токена, що відповідає цьому виклику. Спершу додайте токен.</string>
     <string name="ocra_pick_token">Оберіть токен для відповіді</string>
     <string name="ocra_copied">Відгук скопійовано</string>
+    <string name="ocra_token_added">OCRA-токен «%1$s» додано. Тепер відскануйте QR-код виклику (Крок 2 на стенді).</string>
 
     <!-- Міграція -->
     <string name="migration_title">Перенесення токенів</string>

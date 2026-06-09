@@ -44,11 +44,12 @@ import java.util.concurrent.Executors
  * Працює повністю офлайн; кадри нікуди не передаються. Відмова в дозволі
  * камери пояснюється користувачеві (edge case специфікації).
  *
- * @param continuous false — одна доставка результату (додавання токена);
- *        true — кожне нове значення доставляється один раз (кадри міграції)
+ * Кожне РІЗНЕ значення доставляється рівно один раз: після помилкового QR
+ * сканер продовжує працювати (виправлення першого прогону T020/T032), а
+ * повторні розпізнавання того самого коду не спамлять обробника.
  */
 @Composable
-fun QrScanner(continuous: Boolean = false, onResult: (String) -> Unit) {
+fun QrScanner(onResult: (String) -> Unit) {
     val context = LocalContext.current
     var hasPermission by remember {
         mutableStateOf(
@@ -67,7 +68,7 @@ fun QrScanner(continuous: Boolean = false, onResult: (String) -> Unit) {
     }
 
     when {
-        hasPermission -> CameraPreview(continuous, onResult)
+        hasPermission -> CameraPreview(onResult)
         permissionDenied -> PermissionMessage(R.string.scan_permission_denied)
         else -> PermissionMessage(R.string.scan_permission_rationale)
     }
@@ -85,7 +86,7 @@ private fun PermissionMessage(textRes: Int) {
 }
 
 @Composable
-private fun CameraPreview(continuous: Boolean, onResult: (String) -> Unit) {
+private fun CameraPreview(onResult: (String) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember { Executors.newSingleThreadExecutor() }
@@ -96,8 +97,7 @@ private fun CameraPreview(continuous: Boolean, onResult: (String) -> Unit) {
                 .build(),
         )
     }
-    // Разовий режим: одна доставка; безперервний: кожне значення — один раз
-    var delivered by remember { mutableStateOf(false) }
+    // Кожне різне значення — рівно одна доставка
     val seenValues = remember { mutableSetOf<String>() }
 
     DisposableEffect(Unit) {
@@ -121,14 +121,8 @@ private fun CameraPreview(continuous: Boolean, onResult: (String) -> Unit) {
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
                 analysis.setAnalyzer(executor) { imageProxy ->
-                    processFrame(imageProxy) { value ->
-                        when {
-                            continuous -> if (seenValues.add(value)) onResult(value)
-                            !delivered -> {
-                                delivered = true
-                                onResult(value)
-                            }
-                        }
+                    processFrame(scanner, imageProxy) { value ->
+                        if (seenValues.add(value)) onResult(value)
                     }
                 }
                 provider.unbindAll()
@@ -140,11 +134,13 @@ private fun CameraPreview(continuous: Boolean, onResult: (String) -> Unit) {
         },
     )
 
-    @Suppress("UNUSED_EXPRESSION")
-    scanner // утримуємо посилання, доки composable живий
 }
 
-private fun processFrame(imageProxy: ImageProxy, onQr: (String) -> Unit) {
+private fun processFrame(
+    scanner: com.google.mlkit.vision.barcode.BarcodeScanner,
+    imageProxy: ImageProxy,
+    onQr: (String) -> Unit,
+) {
     @androidx.camera.core.ExperimentalGetImage
     val mediaImage = imageProxy.image
     if (mediaImage == null) {
@@ -152,7 +148,7 @@ private fun processFrame(imageProxy: ImageProxy, onQr: (String) -> Unit) {
         return
     }
     val input = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-    BarcodeScanning.getClient().process(input)
+    scanner.process(input)
         .addOnSuccessListener { barcodes ->
             barcodes.firstOrNull()?.rawValue?.let(onQr)
         }
