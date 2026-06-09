@@ -113,12 +113,12 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Реалізувати парсер профілів `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/ocra/OcraSuite.kt`: лише QN08, хеші SHA1/256/512, digits 6/8, опціональний T30S/T1M; відхилення C/P/S (FR-013, data-model.md)
-- [ ] T027 [US3] Реалізувати обчислення відгуку `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/ocra/Ocra.kt`: DataInput = suite ‖ 0x00 ‖ Q(128 Б за RFC §5.1) [‖ T 8 Б BE], MAC + усічення з T008/T009 (FR-015, contracts §3)
-- [ ] T028 [US3] Додати OCRA-вектори в `android-app/core-crypto/src/test/kotlin/ua/authapp/crypto/OcraVectorTest.kt` на `shared/test-vectors/ocra.json` — 100% зелені (SC-002)
-- [ ] T029 [US3] Реалізувати екран `android-app/app/src/main/kotlin/ua/authapp/ui/OcraScreen.kt`: сканування QR-виклику (повторне використання T016), парсинг `authapp://ocra-challenge` у `core-crypto/codec/OtpUri.kt`, вибір токена при неоднозначності за label (FR-012), показ відгуку великим шрифтом + копіювання по тапу
-- [ ] T030 [P] [US3] Реалізувати `web-stand/src/crypto/ocra.js` + тести в `web-stand/tests/ocra.test.js` на тих самих векторах
-- [ ] T031 [US3] Реалізувати сторінку-симулятор `web-stand/src/pages/ocra.js`: конфігурація suite+секрет, провіжининг-QR `authapp://ocra-token`, генерація виклику (CSPRNG QN08, cid, exp=120 с) у QR, валідація відгуку (вікно ±1 крок для T-профілів), стани ISSUED→VALIDATED/EXPIRED у пам'яті сесії, відхилення повторної валідації (FR-014, FR-023)
+- [x] T026 [P] [US3] Реалізувати парсер профілів `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/ocra/OcraSuite.kt`: лише QN08, хеші SHA1/256/512, digits 6/8, опціональний T30S/T1M; відхилення C/P/S (FR-013, data-model.md)
+- [x] T027 [US3] Реалізувати обчислення відгуку `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/ocra/Ocra.kt`: DataInput = suite ‖ 0x00 ‖ Q(128 Б за RFC §5.1) [‖ T 8 Б BE], MAC + усічення з T008/T009 (FR-015, contracts §3)
+- [x] T028 [US3] Додати OCRA-вектори в `android-app/core-crypto/src/test/kotlin/ua/authapp/crypto/OcraVectorTest.kt` на `shared/test-vectors/ocra.json` — 100% зелені (SC-002)
+- [x] T029 [US3] Реалізувати екран `android-app/app/src/main/kotlin/ua/authapp/ui/OcraScreen.kt`: сканування QR-виклику (повторне використання T016), парсинг `authapp://ocra-challenge` у `core-crypto/codec/OtpUri.kt`, вибір токена при неоднозначності за label (FR-012), показ відгуку великим шрифтом + копіювання по тапу
+- [x] T030 [P] [US3] Реалізувати `web-stand/src/crypto/ocra.js` + тести в `web-stand/tests/ocra.test.js` на тих самих векторах
+- [x] T031 [US3] Реалізувати сторінку-симулятор `web-stand/src/pages/ocra.js`: конфігурація suite+секрет, провіжининг-QR `authapp://ocra-token`, генерація виклику (CSPRNG QN08, cid, exp=120 с) у QR, валідація відгуку (вікно ±1 крок для T-профілів), стани ISSUED→VALIDATED/EXPIRED у пам'яті сесії, відхилення повторної валідації (FR-014, FR-023)
 - [ ] T032 [US3] Прогнати сценарії приймання US3 (spec.md) + сценарій 3 quickstart.md, зафіксувати в `specs/001-totp-ocra-auth/checklists/us3-validation.md`
 
 **Checkpoint**: повний цикл OCRA працює; вектори RFC 6287 зелені в обох реалізаціях
