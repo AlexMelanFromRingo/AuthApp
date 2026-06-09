@@ -43,9 +43,12 @@ import java.util.concurrent.Executors
  * Сканер QR-кодів: CameraX (прев'ю + аналіз кадрів) + ML Kit on-device.
  * Працює повністю офлайн; кадри нікуди не передаються. Відмова в дозволі
  * камери пояснюється користувачеві (edge case специфікації).
+ *
+ * @param continuous false — одна доставка результату (додавання токена);
+ *        true — кожне нове значення доставляється один раз (кадри міграції)
  */
 @Composable
-fun QrScanner(onResult: (String) -> Unit) {
+fun QrScanner(continuous: Boolean = false, onResult: (String) -> Unit) {
     val context = LocalContext.current
     var hasPermission by remember {
         mutableStateOf(
@@ -64,7 +67,7 @@ fun QrScanner(onResult: (String) -> Unit) {
     }
 
     when {
-        hasPermission -> CameraPreview(onResult)
+        hasPermission -> CameraPreview(continuous, onResult)
         permissionDenied -> PermissionMessage(R.string.scan_permission_denied)
         else -> PermissionMessage(R.string.scan_permission_rationale)
     }
@@ -82,7 +85,7 @@ private fun PermissionMessage(textRes: Int) {
 }
 
 @Composable
-private fun CameraPreview(onResult: (String) -> Unit) {
+private fun CameraPreview(continuous: Boolean, onResult: (String) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember { Executors.newSingleThreadExecutor() }
@@ -93,8 +96,9 @@ private fun CameraPreview(onResult: (String) -> Unit) {
                 .build(),
         )
     }
-    // Зупиняємо доставку результатів після першого успішного розпізнавання
+    // Разовий режим: одна доставка; безперервний: кожне значення — один раз
     var delivered by remember { mutableStateOf(false) }
+    val seenValues = remember { mutableSetOf<String>() }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -118,9 +122,12 @@ private fun CameraPreview(onResult: (String) -> Unit) {
                     .build()
                 analysis.setAnalyzer(executor) { imageProxy ->
                     processFrame(imageProxy) { value ->
-                        if (!delivered) {
-                            delivered = true
-                            onResult(value)
+                        when {
+                            continuous -> if (seenValues.add(value)) onResult(value)
+                            !delivered -> {
+                                delivered = true
+                                onResult(value)
+                            }
                         }
                     }
                 }
