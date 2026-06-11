@@ -15,7 +15,9 @@ import ua.authapp.crypto.codec.UriFormatException
  */
 object FrameCodec {
 
-    const val CHUNK_SIZE = 512
+    // 256 Б на кадр → QR ~версії 15 (77×77 модулів): впевнено сканується
+    // екран-у-камеру; 512 Б давали ~версію 22, заважку для сканера
+    const val CHUNK_SIZE = 256
 
     @Serializable
     data class Header(

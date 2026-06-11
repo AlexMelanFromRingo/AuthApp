@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -136,6 +137,8 @@ fun ExportScreen(onBack: () -> Unit) {
                 Image(
                     bitmap = bitmap.asImageBitmap(),
                     contentDescription = null,
+                    // Без згладжування: краї модулів QR лишаються різкими
+                    filterQuality = FilterQuality.None,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
