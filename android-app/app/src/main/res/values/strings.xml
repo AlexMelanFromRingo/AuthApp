@@ -30,6 +30,18 @@
     <string name="add_duplicate_replace">Замінити</string>
     <string name="add_duplicate_keep_both">Додати окремо</string>
     <string name="add_success">Токен «%1$s» додано</string>
+    <string name="add_tab_scan">Сканер QR</string>
+    <string name="add_tab_manual">Вручну</string>
+    <string name="manual_issuer">Назва сервісу</string>
+    <string name="manual_account">Обліковий запис</string>
+    <string name="manual_secret">Секрет (Base32)</string>
+    <string name="manual_algorithm">Алгоритм</string>
+    <string name="manual_digits">Довжина коду</string>
+    <string name="manual_period">Період, секунд</string>
+    <string name="manual_save">Додати токен</string>
+    <string name="gauth_imported">Імпортовано з Google Authenticator: %1$d</string>
+    <string name="gauth_imported_skipped">Імпортовано з Google Authenticator: %1$d, пропущено несумісних: %2$d</string>
+    <string name="gauth_batch_hint">Це частина %1$d із %2$d — відскануйте решту QR-кодів експорту</string>
 
     <!-- OCRA -->
     <string name="ocra_title">OCRA: виклик-відповідь</string>

@@ -239,10 +239,68 @@ def gen_ocra() -> dict:
     return {"cases": cases}
 
 
+# ---------------------------------------------------------------------------
+# Google Authenticator (otpauth-migration): ручне кодування protobuf —
+# незалежний еталон для Kotlin-декодера (без залежності від protobuf-бібліотек)
+# ---------------------------------------------------------------------------
+
+def _varint(n: int) -> bytes:
+    out = b""
+    while True:
+        b = n & 0x7F
+        n >>= 7
+        out += bytes([b | 0x80] if n else [b])
+        if not n:
+            return out
+
+
+def _field_bytes(no: int, payload: bytes) -> bytes:
+    return _varint((no << 3) | 2) + _varint(len(payload)) + payload
+
+
+def _field_varint(no: int, value: int) -> bytes:
+    return _varint((no << 3) | 0) + _varint(value)
+
+
+def _otp_param(secret: bytes, name: str, issuer: str, alg: int, digits: int, otp_type: int) -> bytes:
+    msg = (_field_bytes(1, secret) + _field_bytes(2, name.encode())
+           + _field_bytes(3, issuer.encode()) + _field_varint(4, alg)
+           + _field_varint(5, digits) + _field_varint(6, otp_type))
+    return _field_bytes(1, msg)
+
+
+def gen_gauth() -> dict:
+    import base64
+    import urllib.parse
+    # Два валідні TOTP-токени + один HOTP (має бути пропущений імпортером)
+    payload = (
+        _otp_param(b"12345678901234567890", "Стенд:demo@stand", "Стенд", alg=1, digits=1, otp_type=2)
+        + _otp_param(OCRA_KEY32, "acct2", "Test", alg=2, digits=2, otp_type=2)
+        + _otp_param(b"12345678901234567890", "hotp-acct", "Skip", alg=1, digits=1, otp_type=1)
+        + _field_varint(2, 1)   # version
+        + _field_varint(3, 1)   # batch_size
+        + _field_varint(4, 0)   # batch_index
+    )
+    b64 = base64.b64encode(payload).decode()
+    uri = "otpauth-migration://offline?data=" + urllib.parse.quote(b64, safe="")
+    return {
+        "cases": [{
+            "uri": uri,
+            "skipped": 1,
+            "expected": [
+                {"issuer": "Стенд", "account": "demo@stand",
+                 "secretHex": b"12345678901234567890".hex(), "alg": "SHA1", "digits": 6},
+                {"issuer": "Test", "account": "acct2",
+                 "secretHex": OCRA_KEY32.hex(), "alg": "SHA256", "digits": 8},
+            ],
+        }],
+    }
+
+
 def main() -> None:
     self_check()
     for name, data in (("totp", gen_totp()), ("truncation", gen_truncation()),
-                       ("ocra", gen_ocra())):
+                       ("ocra", gen_ocra()), ("gauth", gen_gauth())):
         path = OUT_DIR / f"{name}.json"
         path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n")
         print(f"{path.name}: {len(data['cases'])} кейсів")

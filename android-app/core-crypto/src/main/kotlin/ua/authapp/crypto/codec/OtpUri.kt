@@ -86,6 +86,33 @@ object OtpUri {
         }
     }
 
+    /**
+     * Ручне введення секрету (аналог «Введіть ключ налаштування» у Google
+     * Authenticator): та сама валідація, що й для QR (FR-006).
+     */
+    fun manualTotp(
+        issuer: String,
+        account: String,
+        secretBase32: String,
+        algorithm: HashAlgorithm,
+        digits: Int,
+        period: Int,
+    ): ParsedQr.TotpToken {
+        val params = mapOf(
+            "secret" to secretBase32,
+            "digits" to digits.toString(),
+            "period" to period.toString(),
+        )
+        return ParsedQr.TotpToken(
+            issuer = issuer.trim().ifBlank { "Без назви" },
+            account = account.trim(),
+            secret = requireSecret(params),
+            algorithm = algorithm,
+            digits = requireDigits(params, max = if (algorithm.isExtended) 10 else 8),
+            period = requirePeriod(params),
+        )
+    }
+
     // -- Розбір окремих форматів ------------------------------------------
 
     private fun parseOtpauthTotp(rawPath: String, params: Map<String, String>): ParsedQr.TotpToken {
@@ -210,6 +237,10 @@ object OtpUri {
                 else decode(pair.take(idx)) to decode(pair.substring(idx + 1))
             }
 
-    private fun decode(s: String): String = URLDecoder.decode(s, Charsets.UTF_8)
+    private fun decode(s: String): String = try {
+        URLDecoder.decode(s, Charsets.UTF_8)
+    } catch (e: IllegalArgumentException) {
+        throw UriFormatException("QR-код містить пошкоджені символи")
+    }
     private fun encode(s: String): String = URLEncoder.encode(s, Charsets.UTF_8).replace("+", "%20")
 }

@@ -1,0 +1,24 @@
+{
+ "cases": [
+  {
+   "uri": "otpauth-migration://offline?data=Cj8KFDEyMzQ1Njc4OTAxMjM0NTY3ODkwEhXQodGC0LXQvdC0OmRlbW9Ac3RhbmQaCtCh0YLQtdC90LQgASgBMAIKNQogMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTISBWFjY3QyGgRUZXN0IAIoAjACCi0KFDEyMzQ1Njc4OTAxMjM0NTY3ODkwEglob3RwLWFjY3QaBFNraXAgASgBMAEQARgBIAA%3D",
+   "skipped": 1,
+   "expected": [
+    {
+     "issuer": "Стенд",
+     "account": "demo@stand",
+     "secretHex": "3132333435363738393031323334353637383930",
+     "alg": "SHA1",
+     "digits": 6
+    },
+    {
+     "issuer": "Test",
+     "account": "acct2",
+     "secretHex": "3132333435363738393031323334353637383930313233343536373839303132",
+     "alg": "SHA256",
+     "digits": 8
+    }
+   ]
+  }
+ ]
+}

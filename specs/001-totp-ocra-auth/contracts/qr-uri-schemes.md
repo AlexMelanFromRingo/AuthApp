@@ -82,6 +82,21 @@ authapp://migrate-receipt?v=1&pid={base64url}&mac={base64url 32Б}
 розбіжність/відсутність → лише примусова деактивація з подвійним
 підтвердженням (FR-019).
 
+## 6. Імпорт Google Authenticator (лише читання)
+
+```
+otpauth-migration://offline?data={URL-encoded base64(protobuf MigrationPayload)}
+```
+
+Схема MigrationPayload (FR-026): поле 1 — repeated OtpParameters
+{1: secret(bytes), 2: name, 3: issuer, 4: algorithm(1=SHA1,2=SHA256,3=SHA512,
+4=MD5), 5: digits(1=6,2=8), 6: type(1=HOTP,2=TOTP), 7: counter};
+поля 2–5 — version/batch_size/batch_index/batch_id. Період — фіксовано 30 с.
+Додаток лише читає цей формат; несумісні записи (HOTP, MD5, секрет поза
+10..64 Б) пропускаються з підрахунком. Декодер — мінімальний власний
+wire-format-парсер (varint + length-delimited), еталонний вектор —
+`shared/test-vectors/gauth.json` (незалежне Python-кодування).
+
 ## Правила еволюції
 
 Будь-яка несумісна зміна параметрів → інкремент `v`; додаток і стенд MUST
