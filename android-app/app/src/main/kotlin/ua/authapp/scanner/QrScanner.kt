@@ -2,9 +2,9 @@ package ua.authapp.scanner
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -14,15 +14,20 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,8 +53,9 @@ import java.util.concurrent.Executors
  * камери пояснюється користувачеві (edge case специфікації).
  *
  * Кожне РІЗНЕ значення доставляється рівно один раз: після помилкового QR
- * сканер продовжує працювати (виправлення першого прогону T020/T032), а
- * повторні розпізнавання того самого коду не спамлять обробника.
+ * сканер продовжує працювати, а повтори того самого коду не спамлять
+ * обробника. Унизу — діагностична панель: лічильник проаналізованих кадрів
+ * (конвеєр живий) і підтвердження розпізнавання.
  */
 @Composable
 fun QrScanner(onResult: (String) -> Unit) {
@@ -90,7 +96,6 @@ private fun PermissionMessage(textRes: Int) {
 
 @Composable
 private fun CameraPreview(onResult: (String) -> Unit) {
-    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember { Executors.newSingleThreadExecutor() }
     val scanner = remember {
@@ -103,6 +108,11 @@ private fun CameraPreview(onResult: (String) -> Unit) {
     // Кожне різне значення — рівно одна доставка
     val seenValues = remember { mutableSetOf<String>() }
 
+    // Діагностика: чи живий конвеєр аналізу і чи розпізнаються коди
+    var framesAnalyzed by remember { mutableIntStateOf(0) }
+    var lastDetectedAt by remember { mutableLongStateOf(0L) }
+    var bindError by remember { mutableStateOf<String?>(null) }
+
     DisposableEffect(Unit) {
         onDispose {
             executor.shutdown()
@@ -110,45 +120,84 @@ private fun CameraPreview(onResult: (String) -> Unit) {
         }
     }
 
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { ctx ->
-            val previewView = PreviewView(ctx)
-            val providerFuture = ProcessCameraProvider.getInstance(ctx)
-            providerFuture.addListener({
-                val provider = providerFuture.get()
-                val preview = Preview.Builder().build().apply {
-                    surfaceProvider = previewView.surfaceProvider
-                }
-                val analysis = ImageAnalysis.Builder()
-                    // Типове розширення аналізу (640×480) замало для щільних
-                    // QR-кадрів міграції — просимо FullHD із фолбеком
-                    .setResolutionSelector(
-                        ResolutionSelector.Builder()
-                            .setResolutionStrategy(
-                                ResolutionStrategy(
-                                    Size(1920, 1080),
-                                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
-                                ),
+    Box(Modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { ctx ->
+                val previewView = PreviewView(ctx)
+                val providerFuture = ProcessCameraProvider.getInstance(ctx)
+                providerFuture.addListener({
+                    try {
+                        val provider = providerFuture.get()
+                        val preview = Preview.Builder().build().apply {
+                            surfaceProvider = previewView.surfaceProvider
+                        }
+                        val analysis = ImageAnalysis.Builder()
+                            // 1280×720 — удвічі краще за типові 640×480 для
+                            // щільних QR і в межах гарантованих конфігурацій
+                            // камер (FullHD на частині пристроїв мовчки
+                            // зупиняв доставку кадрів аналізатору)
+                            .setResolutionSelector(
+                                ResolutionSelector.Builder()
+                                    .setResolutionStrategy(
+                                        ResolutionStrategy(
+                                            Size(1280, 720),
+                                            ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
+                                        ),
+                                    )
+                                    .build(),
                             )
-                            .build(),
-                    )
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                analysis.setAnalyzer(executor) { imageProxy ->
-                    processFrame(scanner, imageProxy) { value ->
-                        if (seenValues.add(value)) onResult(value)
+                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                            .build()
+                        var rawFrames = 0
+                        analysis.setAnalyzer(executor) { imageProxy ->
+                            // Оновлюємо лічильник раз на 5 кадрів, щоб не
+                            // влаштовувати рекомпозицію на кожному кадрі
+                            rawFrames++
+                            if (rawFrames % 5 == 0) framesAnalyzed = rawFrames
+                            processFrame(scanner, imageProxy) { value ->
+                                lastDetectedAt = System.currentTimeMillis()
+                                if (seenValues.add(value)) onResult(value)
+                            }
+                        }
+                        provider.unbindAll()
+                        provider.bindToLifecycle(
+                            lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis,
+                        )
+                    } catch (e: Exception) {
+                        // Конфігурація камери не вдалася — показуємо причину
+                        bindError = e.message ?: e.javaClass.simpleName
                     }
-                }
-                provider.unbindAll()
-                provider.bindToLifecycle(
-                    lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis,
-                )
-            }, ContextCompat.getMainExecutor(ctx))
-            previewView
-        },
-    )
+                }, ContextCompat.getMainExecutor(ctx))
+                previewView
+            },
+        )
 
+        // Діагностична панель сканера
+        Surface(
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+        ) {
+            val detectedRecently =
+                System.currentTimeMillis() - lastDetectedAt < 1500 && lastDetectedAt > 0
+            Text(
+                text = when {
+                    bindError != null -> stringResource(R.string.scan_camera_error, bindError.orEmpty())
+                    detectedRecently -> stringResource(R.string.scan_detected)
+                    framesAnalyzed == 0 -> stringResource(R.string.scan_starting)
+                    else -> stringResource(R.string.scan_searching, framesAnalyzed)
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (bindError != null) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(12.dp),
+            )
+        }
+    }
 }
 
 private fun processFrame(

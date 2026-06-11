@@ -25,6 +25,10 @@
     <string name="scan_permission_rationale">Камера потрібна лише для сканування QR-кодів із параметрами токенів. Зображення нікуди не передаються.</string>
     <string name="scan_permission_denied">Без доступу до камери додати токен через QR неможливо. Надайте дозвіл у налаштуваннях.</string>
     <string name="scan_invalid_qr">QR-код не розпізнано або формат не підтримується</string>
+    <string name="scan_starting">Запуск камери…</string>
+    <string name="scan_searching">Шукаю QR-код… (кадрів: %1$d)</string>
+    <string name="scan_detected">✓ QR розпізнано</string>
+    <string name="scan_camera_error">Помилка камери: %1$s</string>
     <string name="add_duplicate_title">Такий токен уже існує</string>
     <string name="add_duplicate_message">Токен з тими самими параметрами вже збережено. Замінити його чи додати окремий запис?</string>
     <string name="add_duplicate_replace">Замінити</string>
