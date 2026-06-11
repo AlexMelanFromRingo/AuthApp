@@ -56,7 +56,7 @@ data class Token(
                 secretBase32 = Base32.encode(parsed.secret),
                 ocraSuite = parsed.suite,
             )
-            is ParsedQr.OcraChallenge ->
+            is ParsedQr.OcraChallenge, is ParsedQr.OcraMutualChallenge ->
                 throw IllegalArgumentException("QR-код містить виклик, а не токен. Використайте екран OCRA.")
         }
     }
