@@ -154,6 +154,14 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 
 ---
 
+## Phase 8: Розширення після прогону (запити замовника 2026-06-11)
+
+- [x] T044 [US1] Ручне введення секрету: вкладка «Вручну» в `android-app/app/src/main/kotlin/ua/authapp/ui/AddTokenScreen.kt`, `OtpUri.manualTotp` з тією самою валідацією (FR-025)
+- [x] T045 [US1] Імпорт Google Authenticator: `android-app/core-crypto/src/main/kotlin/ua/authapp/crypto/codec/GoogleAuthMigration.kt` — власний protobuf wire-декодер, пропуск несумісних записів, багаточастинний експорт (FR-026, contracts §6)
+- [x] T046 [US1] Еталонний вектор `shared/test-vectors/gauth.json` (незалежне Python-кодування protobuf у generate.py) + `GoogleAuthMigrationTest` — 132/132 тестів ядра зелені
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
