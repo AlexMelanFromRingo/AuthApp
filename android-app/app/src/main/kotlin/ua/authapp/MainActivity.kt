@@ -9,7 +9,7 @@ import ua.authapp.ui.theme.AuthAppTheme
 
 /**
  * Єдина активність додатка. FragmentActivity потрібна для BiometricPrompt.
- * FLAG_SECURE забороняє скріншоти і запис екрана на всіх екранах із секретами
+ * FLAG_SECURE забороняє знімок з екрана і запис екрана на всіх екранах із секретами
  * (Конституція, Принцип I; FR-003).
  */
 class MainActivity : FragmentActivity() {
