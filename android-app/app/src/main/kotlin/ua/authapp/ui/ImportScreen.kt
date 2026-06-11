@@ -1,5 +1,6 @@
 package ua.authapp.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -153,9 +154,21 @@ fun ImportScreen(onBack: () -> Unit) {
                             error = null
                             if (assembler.accept(raw)) {
                                 receivedCount = assembler.receivedCount
+                                // Гучне підтвердження кожного кадра — прогрес
+                                // угорі легко не помітити, тримаючи два пристрої
+                                Toast.makeText(
+                                    context,
+                                    context.getString(
+                                        R.string.import_progress,
+                                        receivedCount,
+                                        assembler.total ?: receivedCount,
+                                    ),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                             }
                         } catch (e: UriFormatException) {
                             error = e.message
+                            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                         }
                     },
                 )
