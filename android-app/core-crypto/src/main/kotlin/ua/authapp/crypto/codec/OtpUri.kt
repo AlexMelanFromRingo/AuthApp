@@ -32,6 +32,29 @@ sealed interface ParsedQr {
         val cid: String,
         val expSeconds: Int,
         val label: String?,
+        /** Значення лічильника для C-профілів (синхронізує сервер) */
+        val counter: Long? = null,
+        /** Сесійні дані для S-профілів (base64url) */
+        val sessionB64: String? = null,
+        /** "sign" — підпис транзакції (q = дані транзакції) */
+        val mode: String? = null,
+    ) : ParsedQr
+
+    /** Взаємна автентифікація (RFC 6287 §7.2): клієнт спершу перевіряє сервер. */
+    data class OcraMutualChallenge(
+        /** Профіль обчислення клієнта (= профіль токена) */
+        val clientSuite: String,
+        /** Профіль обчислення сервера */
+        val serverSuite: String,
+        /** Виклик клієнта QC */
+        val qc: String,
+        /** Виклик сервера QS */
+        val qs: String,
+        /** Відгук сервера = OCRA(K, Q = QC ‖ QS) — клієнт верифікує */
+        val serverResponse: String,
+        val cid: String,
+        val expSeconds: Int,
+        val label: String?,
     ) : ParsedQr
 }
 
@@ -63,6 +86,7 @@ object OtpUri {
                     "totp" -> parseAuthappTotp(params)
                     "ocra-token" -> parseOcraToken(params)
                     "ocra-challenge" -> parseOcraChallenge(params)
+                    "ocra-mutual" -> parseOcraMutual(params)
                     else -> throw UriFormatException("Невідомий тип QR-коду: «$host»")
                 }
             }
@@ -164,17 +188,32 @@ object OtpUri {
     private fun parseOcraChallenge(params: Map<String, String>): ParsedQr.OcraChallenge {
         val suite = params["suite"]
             ?: throw UriFormatException("У виклику відсутній OCRA-профіль (suite)")
-        val q = params["q"]
+        val q = params["q"]?.ifBlank { null }
             ?: throw UriFormatException("У виклику відсутнє значення Q")
-        if (!q.matches(Regex("^\\d{8}$"))) {
-            throw UriFormatException("Виклик має складатися з 8 цифр (профіль QN08)")
-        }
         val cid = params["cid"]
             ?: throw UriFormatException("У виклику відсутній ідентифікатор (cid)")
         return ParsedQr.OcraChallenge(
             suite = suite,
-            q = q,
+            q = q, // формат виклику валідується ядром за профілем (QN/QA/QH)
             cid = cid,
+            expSeconds = params["exp"]?.toIntOrNull() ?: 120,
+            label = params["label"],
+            counter = params["c"]?.toLongOrNull(),
+            sessionB64 = params["s"],
+            mode = params["mode"],
+        )
+    }
+
+    private fun parseOcraMutual(params: Map<String, String>): ParsedQr.OcraMutualChallenge {
+        fun required(key: String, what: String): String = params[key]?.ifBlank { null }
+            ?: throw UriFormatException("У виклику взаємної автентифікації відсутній $what ($key)")
+        return ParsedQr.OcraMutualChallenge(
+            clientSuite = required("csuite", "профіль клієнта"),
+            serverSuite = required("ssuite", "профіль сервера"),
+            qc = required("qc", "виклик клієнта"),
+            qs = required("qs", "виклик сервера"),
+            serverResponse = required("srv", "відгук сервера"),
+            cid = required("cid", "ідентифікатор"),
             expSeconds = params["exp"]?.toIntOrNull() ?: 120,
             label = params["label"],
         )

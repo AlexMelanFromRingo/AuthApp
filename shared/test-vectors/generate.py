@@ -86,23 +86,53 @@ def totp(alg: str, secret: bytes, time_s: int, period: int, digits: int) -> str:
     return truncate(alg, compute_mac(alg, secret, counter), digits)[1]
 
 
-def ocra(suite: str, key: bytes, q: str, time_s: int | None = None) -> str:
-    crypto = suite.split(":")[1]            # HOTP-SHA1-6
+def ocra(suite: str, key: bytes, q: str, counter: int | None = None,
+         pin_hash: bytes | None = None, session: bytes | None = None,
+         time_s: int | None = None) -> str:
+    """Повний DataInput за RFC 6287 §5.1: suite | 00 | [C] | Q | [P] | [S] | [T]."""
+    crypto = suite.split(":")[1]            # HOTP-SHA256-8
     _, halg, digits = crypto.split("-")
+    parts = suite.split(":")[2].split("-")  # напр. C-QN08-PSHA1-S064-T1M
+
     data = suite.encode() + b"\x00"
 
-    # Q: число -> hex-рядок (доповнений до парної довжини) -> 128 байтів
-    qhex = format(int(q), "x")
-    if len(qhex) % 2:
-        qhex += "0"
-    data += bytes.fromhex(qhex).ljust(128, b"\x00")
+    if parts[0] == "C":
+        if counter is None:
+            raise ValueError("Профіль із лічильником потребує counter")
+        data += counter.to_bytes(8, "big")
+        parts = parts[1:]
 
-    datainput_suffix = suite.split(":")[2]  # QN08[-T30S|-T1M]
-    if "-T" in datainput_suffix:
-        step = {"T30S": 30, "T1M": 60}[datainput_suffix.split("-")[1]]
-        if time_s is None:
-            raise ValueError("Часовий профіль потребує time_s")
-        data += (time_s // step).to_bytes(8, "big")
+    qspec = parts[0]                         # Q{N|A|H}{nn}
+    qfmt = qspec[1]
+    if qfmt == "N":
+        qhex = format(int(q), "x")
+        if len(qhex) % 2:
+            qhex += "0"
+        qbytes = bytes.fromhex(qhex)
+    elif qfmt == "A":
+        qbytes = q.encode("ascii")
+    elif qfmt == "H":
+        qbytes = bytes.fromhex(q if len(q) % 2 == 0 else q + "0")
+    else:
+        raise ValueError(f"Невідомий формат виклику {qspec}")
+    data += qbytes.ljust(128, b"\x00")
+
+    for part in parts[1:]:
+        if part.startswith("PSHA"):
+            if pin_hash is None:
+                raise ValueError("Профіль із PIN потребує pin_hash")
+            data += pin_hash
+        elif part.startswith("S"):
+            length = int(part[1:])
+            if session is None:
+                raise ValueError("Профіль із сесією потребує session")
+            data += session.ljust(length, b"\x00")[:length]
+        elif part.startswith("T"):
+            unit = {"S": 1, "M": 60, "H": 3600}[part[-1]]
+            step = int(part[1:-1]) * unit
+            if time_s is None:
+                raise ValueError("Часовий профіль потребує time_s")
+            data += (time_s // step).to_bytes(8, "big")
 
     return truncate(halg, compute_mac(halg, key, data), int(digits))[1]
 
@@ -126,10 +156,30 @@ RFC6238_EXPECTED = {
 OCRA_KEY20 = b"12345678901234567890"
 OCRA_KEY32 = b"12345678901234567890123456789012"
 OCRA_KEY64 = b"1234567890" * 6 + b"1234"
+PIN_1234_SHA1 = bytes.fromhex("7110eda4d09e062aa5e4a390b0a572ac0d2c0220")
+RFC_T = 0x132D0B6 * 60  # «Mar 25 2008 12:06:30 GMT» → T1M-кроки 0x132d0b6
+
+# Офіційні вектори RFC 6287 Appendix C (повний набір)
 RFC6287_QN08_SHA1 = (
     "237653", "243178", "653583", "740991", "608993",
     "388898", "816933", "224598", "750600", "294470",
 )
+RFC6287_C_QN08_PSHA1 = (
+    "65347737", "86775851", "78192410", "71565254", "10104329",
+    "65983500", "70069104", "91771096", "75011558", "08522129",
+)
+RFC6287_QN08_PSHA1 = ("83238735", "01501458", "17957585", "86776967", "86807031")
+RFC6287_C_QN08_SHA512 = (
+    "07016083", "63947962", "70123924", "25341727", "33203315",
+    "34205738", "44343969", "51946085", "20403879", "31409299",
+)
+RFC6287_QN08_T1M = ("95209754", "55907591", "22048402", "24218844", "36209546")
+RFC6287_MUTUAL_SRV_256 = ("28247970", "01984843", "65387857", "03351211", "83412541")
+RFC6287_MUTUAL_CLI_256 = ("15510767", "90175646", "33777207", "95285278", "28934924")
+RFC6287_MUTUAL_SRV_512 = ("79496648", "76831980", "12250499", "90856481", "12761449")
+RFC6287_MUTUAL_CLI_512P = ("18806276", "70020315", "01600026", "18951020", "32528969")
+RFC6287_SIG_QA08 = ("53095496", "04110475", "31331128", "76028668", "46554205")
+RFC6287_SIG_QA10_T1M = ("77537423", "31970405", "10235557", "95213541", "65360607")
 
 
 def self_check() -> None:
@@ -138,12 +188,44 @@ def self_check() -> None:
             got = totp(alg, RFC6238_SECRETS[alg], t, 30, 8)
             assert got == expected, f"RFC 6238 {alg} t={t}: {got} != {expected}"
 
-    for i, expected in enumerate(RFC6287_QN08_SHA1):
-        q = str(i) * 8
-        got = ocra("OCRA-1:HOTP-SHA1-6:QN08", OCRA_KEY20, q)
-        assert got == expected, f"RFC 6287 QN08 q={q}: {got} != {expected}"
+    checks = []
+    # C.1: односторонні
+    for i, exp in enumerate(RFC6287_QN08_SHA1):
+        checks.append((ocra("OCRA-1:HOTP-SHA1-6:QN08", OCRA_KEY20, str(i) * 8), exp))
+    for c, exp in enumerate(RFC6287_C_QN08_PSHA1):
+        checks.append((ocra("OCRA-1:HOTP-SHA256-8:C-QN08-PSHA1", OCRA_KEY32,
+                            "12345678", counter=c, pin_hash=PIN_1234_SHA1), exp))
+    for i, exp in enumerate(RFC6287_QN08_PSHA1):
+        checks.append((ocra("OCRA-1:HOTP-SHA256-8:QN08-PSHA1", OCRA_KEY32,
+                            str(i) * 8, pin_hash=PIN_1234_SHA1), exp))
+    for c, exp in enumerate(RFC6287_C_QN08_SHA512):
+        checks.append((ocra("OCRA-1:HOTP-SHA512-8:C-QN08", OCRA_KEY64,
+                            str(c) * 8, counter=c), exp))
+    for i, exp in enumerate(RFC6287_QN08_T1M):
+        checks.append((ocra("OCRA-1:HOTP-SHA512-8:QN08-T1M", OCRA_KEY64,
+                            str(i) * 8, time_s=RFC_T), exp))
+    # C.2: взаємна автентифікація (сервер: Q=QC‖QS; клієнт: Q=QS‖QC)
+    for i in range(5):
+        qc, qs = f"CLI2222{i}", f"SRV1111{i}"
+        checks.append((ocra("OCRA-1:HOTP-SHA256-8:QA08", OCRA_KEY32, qc + qs),
+                       RFC6287_MUTUAL_SRV_256[i]))
+        checks.append((ocra("OCRA-1:HOTP-SHA256-8:QA08", OCRA_KEY32, qs + qc),
+                       RFC6287_MUTUAL_CLI_256[i]))
+        checks.append((ocra("OCRA-1:HOTP-SHA512-8:QA08", OCRA_KEY64, qc + qs),
+                       RFC6287_MUTUAL_SRV_512[i]))
+        checks.append((ocra("OCRA-1:HOTP-SHA512-8:QA08-PSHA1", OCRA_KEY64, qs + qc,
+                            pin_hash=PIN_1234_SHA1), RFC6287_MUTUAL_CLI_512P[i]))
+    # C.3: підпис транзакцій
+    for i, exp in enumerate(RFC6287_SIG_QA08):
+        checks.append((ocra("OCRA-1:HOTP-SHA256-8:QA08", OCRA_KEY32, f"SIG1{i}000"), exp))
+    for i, exp in enumerate(RFC6287_SIG_QA10_T1M):
+        checks.append((ocra("OCRA-1:HOTP-SHA512-8:QA10-T1M", OCRA_KEY64,
+                            f"SIG1{i}00000", time_s=RFC_T), exp))
 
-    print("Самоперевірка RFC 6238 + RFC 6287 пройдена")
+    for got, expected in checks:
+        assert got == expected, f"RFC 6287: {got} != {expected}"
+
+    print(f"Самоперевірка RFC 6238 + RFC 6287 пройдена ({len(checks)} OCRA-векторів)")
 
 
 # ---------------------------------------------------------------------------
@@ -217,25 +299,68 @@ def gen_truncation() -> dict:
 
 
 def gen_ocra() -> dict:
+    def case(suite, key, q, counter=None, pin_hash=None, session=None,
+             time_s=None, source=None, expected=None):
+        entry = {"suite": suite, "keyHex": key.hex(), "q": q}
+        if counter is not None:
+            entry["counter"] = counter
+        if pin_hash is not None:
+            entry["pinHashHex"] = pin_hash.hex()
+        if session is not None:
+            entry["sessionHex"] = session.hex()
+        if time_s is not None:
+            entry["time"] = time_s
+        entry["expected"] = expected or ocra(
+            suite, key, q, counter, pin_hash, session, time_s)
+        if source:
+            entry["source"] = source
+        return entry
+
+    rfc = "RFC 6287 Appendix C"
     cases = []
-    # Офіційні вектори RFC 6287 C.1 (один-бік, QN08, SHA1-6)
-    for i, expected in enumerate(RFC6287_QN08_SHA1):
-        cases.append({
-            "suite": "OCRA-1:HOTP-SHA1-6:QN08", "keyHex": OCRA_KEY20.hex(),
-            "q": str(i) * 8, "expected": expected, "source": "RFC 6287 Appendix C.1",
-        })
-    # Власні вектори: SHA256/SHA512 QN08 (генеруються референсом)
-    for suite, key in (("OCRA-1:HOTP-SHA256-8:QN08", OCRA_KEY32),
-                       ("OCRA-1:HOTP-SHA512-8:QN08", OCRA_KEY64)):
-        for q in ("00000000", "11111111", "48217390", "99999999"):
-            cases.append({"suite": suite, "keyHex": key.hex(), "q": q,
-                          "expected": ocra(suite, key, q)})
-    # Часові профілі
-    for suite, key in (("OCRA-1:HOTP-SHA256-8:QN08-T30S", OCRA_KEY32),
-                       ("OCRA-1:HOTP-SHA512-8:QN08-T1M", OCRA_KEY64)):
-        for q, t in (("11111111", 1111111111), ("48217390", 1234567890)):
-            cases.append({"suite": suite, "keyHex": key.hex(), "q": q, "time": t,
-                          "expected": ocra(suite, key, q, t)})
+    # C.1 — усі офіційні таблиці
+    for i, exp in enumerate(RFC6287_QN08_SHA1):
+        cases.append(case("OCRA-1:HOTP-SHA1-6:QN08", OCRA_KEY20, str(i) * 8,
+                          source=rfc, expected=exp))
+    for c, exp in enumerate(RFC6287_C_QN08_PSHA1):
+        cases.append(case("OCRA-1:HOTP-SHA256-8:C-QN08-PSHA1", OCRA_KEY32, "12345678",
+                          counter=c, pin_hash=PIN_1234_SHA1, source=rfc, expected=exp))
+    for i, exp in enumerate(RFC6287_QN08_PSHA1):
+        cases.append(case("OCRA-1:HOTP-SHA256-8:QN08-PSHA1", OCRA_KEY32, str(i) * 8,
+                          pin_hash=PIN_1234_SHA1, source=rfc, expected=exp))
+    for c, exp in enumerate(RFC6287_C_QN08_SHA512):
+        cases.append(case("OCRA-1:HOTP-SHA512-8:C-QN08", OCRA_KEY64, str(c) * 8,
+                          counter=c, source=rfc, expected=exp))
+    for i, exp in enumerate(RFC6287_QN08_T1M):
+        cases.append(case("OCRA-1:HOTP-SHA512-8:QN08-T1M", OCRA_KEY64, str(i) * 8,
+                          time_s=RFC_T, source=rfc, expected=exp))
+    # C.2 — взаємна автентифікація
+    for i in range(5):
+        qc, qs = f"CLI2222{i}", f"SRV1111{i}"
+        cases.append(case("OCRA-1:HOTP-SHA256-8:QA08", OCRA_KEY32, qc + qs,
+                          source=rfc, expected=RFC6287_MUTUAL_SRV_256[i]))
+        cases.append(case("OCRA-1:HOTP-SHA256-8:QA08", OCRA_KEY32, qs + qc,
+                          source=rfc, expected=RFC6287_MUTUAL_CLI_256[i]))
+        cases.append(case("OCRA-1:HOTP-SHA512-8:QA08", OCRA_KEY64, qc + qs,
+                          source=rfc, expected=RFC6287_MUTUAL_SRV_512[i]))
+        cases.append(case("OCRA-1:HOTP-SHA512-8:QA08-PSHA1", OCRA_KEY64, qs + qc,
+                          pin_hash=PIN_1234_SHA1, source=rfc,
+                          expected=RFC6287_MUTUAL_CLI_512P[i]))
+    # C.3 — підпис транзакцій
+    for i, exp in enumerate(RFC6287_SIG_QA08):
+        cases.append(case("OCRA-1:HOTP-SHA256-8:QA08", OCRA_KEY32, f"SIG1{i}000",
+                          source=rfc, expected=exp))
+    for i, exp in enumerate(RFC6287_SIG_QA10_T1M):
+        cases.append(case("OCRA-1:HOTP-SHA512-8:QA10-T1M", OCRA_KEY64, f"SIG1{i}00000",
+                          time_s=RFC_T, source=rfc, expected=exp))
+    # Власні вектори: T30S і сесійні дані (офіційних не існує)
+    for q, t in (("11111111", 1111111111), ("48217390", 1234567890)):
+        cases.append(case("OCRA-1:HOTP-SHA256-8:QN08-T30S", OCRA_KEY32, q, time_s=t))
+    session = b"SESSION-" + b"0123456789ABCDEF" * 3 + b"01234567"  # 64 байти
+    assert len(session) == 64
+    for q in ("00000000", "48217390"):
+        cases.append(case("OCRA-1:HOTP-SHA256-8:QN08-S064", OCRA_KEY32, q,
+                          session=session))
     return {"cases": cases}
 
 

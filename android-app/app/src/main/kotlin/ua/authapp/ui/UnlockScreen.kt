@@ -44,9 +44,11 @@ fun UnlockScreen(onUnlocked: () -> Unit) {
     var message by remember { mutableStateOf<String?>(null) }
     val state = remember { gate.state() }
 
+    val canPrompt = state == BiometricState.BIOMETRIC || state == BiometricState.DEVICE_CREDENTIAL
+
     // Показуємо запит одразу при появі екрана
     LaunchedEffect(Unit) {
-        if (state == BiometricState.AVAILABLE) {
+        if (canPrompt) {
             gate.prompt(onSuccess = onUnlocked, onFailure = { message = it?.toString() })
         }
     }
@@ -66,16 +68,17 @@ fun UnlockScreen(onUnlocked: () -> Unit) {
         Spacer(Modifier.height(8.dp))
         Text(
             text = when (state) {
-                BiometricState.NO_HARDWARE -> stringResource(R.string.unlock_error_no_hardware)
-                BiometricState.NOT_ENROLLED -> stringResource(R.string.unlock_error_not_enrolled)
+                BiometricState.NO_PROTECTION -> stringResource(R.string.unlock_error_no_protection)
                 BiometricState.UNAVAILABLE -> stringResource(R.string.unlock_error_unavailable)
-                BiometricState.AVAILABLE -> message ?: stringResource(R.string.unlock_subtitle)
+                BiometricState.DEVICE_CREDENTIAL ->
+                    message ?: stringResource(R.string.unlock_credential_fallback)
+                BiometricState.BIOMETRIC -> message ?: stringResource(R.string.unlock_subtitle)
             },
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
-        if (state == BiometricState.AVAILABLE) {
+        if (canPrompt) {
             Button(onClick = {
                 message = null
                 gate.prompt(onSuccess = onUnlocked, onFailure = { message = it?.toString() })

@@ -6,9 +6,9 @@
     <string name="unlock_title">Підтвердьте особу</string>
     <string name="unlock_subtitle">Доступ до токенів лише після біометричної перевірки</string>
     <string name="unlock_button">Розблокувати</string>
-    <string name="unlock_error_no_hardware">На цьому пристрої немає біометричного сенсора. Додаток недоступний.</string>
-    <string name="unlock_error_not_enrolled">Біометрію не налаштовано. Додайте відбиток пальця або обличчя в налаштуваннях пристрою і поверніться.</string>
-    <string name="unlock_error_unavailable">Біометрія тимчасово недоступна. Спробуйте пізніше.</string>
+    <string name="unlock_error_no_protection">Пристрій не захищено: налаштуйте біометрію або PIN/графічний ключ у налаштуваннях пристрою і поверніться.</string>
+    <string name="unlock_error_unavailable">Автентифікація тимчасово недоступна. Спробуйте пізніше.</string>
+    <string name="unlock_credential_fallback">Біометрія недоступна — використовується PIN або ключ пристрою</string>
 
     <!-- Список токенів -->
     <string name="tokens_title">Мої токени</string>
@@ -51,6 +51,12 @@
     <string name="ocra_pick_token">Оберіть токен для відповіді</string>
     <string name="ocra_copied">Відгук скопійовано</string>
     <string name="ocra_token_added">OCRA-токен «%1$s» додано. Тепер відскануйте QR-код виклику (Крок 2 на стенді).</string>
+    <string name="ocra_pin_title">Введіть PIN-код</string>
+    <string name="ocra_pin_hint">Цей OCRA-профіль вимагає PIN (P-компонент)</string>
+    <string name="ocra_server_verified">✓ Сервер пройшов перевірку справжності</string>
+    <string name="ocra_server_invalid">УВАГА: відгук сервера НЕ підтверджено — можлива підробка. Відповідь не обчислено.</string>
+    <string name="ocra_transaction">Транзакція: %1$s</string>
+    <string name="ocra_sign_response_label">Підпис транзакції</string>
 
     <!-- Міграція -->
     <string name="migration_title">Перенесення токенів</string>

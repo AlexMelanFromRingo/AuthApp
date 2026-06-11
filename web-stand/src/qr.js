@@ -30,8 +30,20 @@ export function buildOcraTokenUri({ issuer, account, secretBase32, suite }) {
     `&issuer=${encodeURIComponent(issuer)}&account=${encodeURIComponent(account)}`;
 }
 
-/** URI OCRA-виклику (FR-014): cid, строк дії 120 с. */
-export function buildChallengeUri({ suite, q, cid, label }) {
-  return `authapp://ocra-challenge?v=1&suite=${encodeURIComponent(suite)}&q=${q}` +
-    `&cid=${cid}&exp=120&label=${encodeURIComponent(label ?? '')}`;
+/** URI OCRA-виклику (FR-014): cid, строк дії 120 с; опційно C/S/режим підпису. */
+export function buildChallengeUri({ suite, q, cid, label, counter, sessionB64, mode }) {
+  let uri = `authapp://ocra-challenge?v=1&suite=${encodeURIComponent(suite)}` +
+    `&q=${encodeURIComponent(q)}&cid=${cid}&exp=120&label=${encodeURIComponent(label ?? '')}`;
+  if (counter != null) uri += `&c=${counter}`;
+  if (sessionB64) uri += `&s=${sessionB64}`;
+  if (mode) uri += `&mode=${mode}`;
+  return uri;
+}
+
+/** URI взаємної автентифікації: клієнт верифікує відгук сервера і відповідає. */
+export function buildMutualUri({ clientSuite, serverSuite, qc, qs, serverResponse, cid, label }) {
+  return `authapp://ocra-mutual?v=1&csuite=${encodeURIComponent(clientSuite)}` +
+    `&ssuite=${encodeURIComponent(serverSuite)}&qc=${encodeURIComponent(qc)}` +
+    `&qs=${encodeURIComponent(qs)}&srv=${serverResponse}&cid=${cid}&exp=120` +
+    `&label=${encodeURIComponent(label ?? '')}`;
 }

@@ -162,6 +162,16 @@ plan.md (R9): стенд (US2) йде одразу після MVP, бо він �
 
 ---
 
+## Phase 9: Повні OCRA-профілі та резервний PIN (запити замовника 2026-06-11)
+
+- [x] T047 Повна граматика OCRA в ядрі: `core-crypto/.../ocra/{OcraSuite,Ocra}.kt` — [C-]Q{N|A|H}{04..64}[-PSHAx][-Snnn][-Tnu], DataInput з усіма компонентами, hashPin; вектори RFC 6287 Appendix C повністю (70 шт.) у generate.py → ocra.json; 187/187 тестів ядра (FR-013, FR-027)
+- [x] T048 JS-дзеркало `web-stand/src/crypto/ocra.js` + тести — 170/170 (ті самі 70 RFC-векторів)
+- [x] T049 Стенд: три режими симулятора OCRA (виклик-відповідь із C/P/S/T, взаємна автентифікація RFC C.2, підпис транзакцій C.3); contracts §3/3а: параметри c/s/mode + схема ocra-mutual
+- [x] T050 Додаток: OcraScreen — PIN-діалог для P-профілів, лічильник/сесія з URI, верифікація сервера до відповіді (mutual), показ транзакції перед підписом
+- [x] T051 Резервний вхід (FR-028): BiometricGate із DEVICE_CREDENTIAL-фолбеком через той самий BiometricPrompt (системний PIN/ключ, апаратний rate-limiting); стан NO_PROTECTION з поясненням
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
