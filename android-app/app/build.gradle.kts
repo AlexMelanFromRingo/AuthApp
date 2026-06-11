@@ -29,10 +29,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
     }
@@ -40,6 +36,12 @@ android {
     packaging {
         // Bouncy Castle постачає підписані метадані, які конфліктують при пакуванні
         resources.excludes += "META-INF/versions/**"
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 

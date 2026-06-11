@@ -1,3 +1,8 @@
+// Бібліотеку security-crypto переведено в режим супроводу (deprecated) —
+// прийнятий ризик R4: API стабільний, явна вимога замовника (file-level
+// suppress, бо попередження виникають уже на імпортах)
+@file:Suppress("DEPRECATION")
+
 package ua.authapp.storage
 
 import android.content.Context
