@@ -31,3 +31,4 @@ __pycache__/
 # ОС
 .DS_Store
 Thumbs.db
+android-app/app/release/
