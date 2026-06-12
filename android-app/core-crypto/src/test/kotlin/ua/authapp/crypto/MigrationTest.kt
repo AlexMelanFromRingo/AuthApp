@@ -98,6 +98,29 @@ class MigrationTest {
     }
 
     @Test
+    fun `кадри - повторне сканування того самого кадру не змінює прогрес`() {
+        // Регресія польового прогону: користувач двічі сканує кадр 1 —
+        // лічильник не повинен зрости і пакет не повинен «завершитися»
+        val pkg = MigrationCrypto.seal("фраза".toCharArray(), manifest, testKdf)
+        val frames = FrameCodec.toFrames(pkg)
+        assertTrue(frames.size >= 2)
+
+        val assembler = FrameCodec.FrameAssembler()
+        assertTrue(assembler.accept(frames[0]))
+        assertEquals(1, assembler.receivedCount)
+        // Повтор того самого кадру — false, стан незмінний
+        assertFalse(assembler.accept(frames[0]))
+        assertEquals(1, assembler.receivedCount)
+        assertFalse(assembler.isComplete)
+        assertEquals((2..frames.size).toList(), assembler.missingFrames())
+
+        // Дозбирання решти кадрів завершує пакет рівно один раз
+        frames.drop(1).forEach { assembler.accept(it) }
+        assertTrue(assembler.isComplete)
+        assertEquals(frames.size, assembler.receivedCount)
+    }
+
+    @Test
     fun `кадри - чужий пакет ігнорується`() {
         val pkgA = MigrationCrypto.seal("a".toCharArray(), manifest, testKdf)
         val pkgB = MigrationCrypto.seal("b".toCharArray(), manifest, testKdf)

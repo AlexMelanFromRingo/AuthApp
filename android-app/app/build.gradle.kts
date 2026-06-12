@@ -37,6 +37,11 @@ android {
         // Bouncy Castle постачає підписані метадані, які конфліктують при пакуванні
         resources.excludes += "META-INF/versions/**"
     }
+
+    testOptions {
+        // JVM-тести модуля використовують JUnit 5 (як і :core-crypto)
+        unitTests.all { it.useJUnitPlatform() }
+    }
 }
 
 kotlin {

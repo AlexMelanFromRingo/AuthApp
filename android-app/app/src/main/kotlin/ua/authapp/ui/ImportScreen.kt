@@ -46,6 +46,11 @@ import ua.authapp.scanner.QrScanner
 /**
  * Імпорт пакета (US4; FR-017, FR-018): сканування кадрів із прогресом і
  * дозбиранням → парольна фраза → атомарний імпорт → QR-квитанція.
+ *
+ * УВАГА (урок першого польового прогону): ВЕСЬ прогрес тримаємо у
+ * snapshot-станах Compose. FrameAssembler — звичайний об'єкт, його полів
+ * композиція «не бачить»: початково жоден стан не читався, тож оновлення
+ * не викликали рекомпозиції — екран замерзав на камері попри прийняті кадри.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +59,12 @@ fun ImportScreen(onBack: () -> Unit) {
     val store = (context.applicationContext as AuthApplication).tokenStore
     val assembler = remember { FrameCodec.FrameAssembler() }
 
+    // Дзеркало стану assembler у snapshot-станах — єдине джерело для UI
     var receivedCount by remember { mutableIntStateOf(0) }
+    var totalFrames by remember { mutableStateOf<Int?>(null) }
+    var missingFrames by remember { mutableStateOf<List<Int>>(emptyList()) }
+    var allFramesReceived by remember { mutableStateOf(false) }
+
     var error by remember { mutableStateOf<String?>(null) }
     var passphrase by remember { mutableStateOf("") }
     var receiptUri by remember { mutableStateOf<String?>(null) }
@@ -90,10 +100,14 @@ fun ImportScreen(onBack: () -> Unit) {
             }
 
             // Крок 2: всі кадри зібрано — парольна фраза і розшифрування
-            assembler.isComplete -> Column(
+            allFramesReceived -> Column(
                 modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                Text(
+                    stringResource(R.string.import_progress, receivedCount, totalFrames ?: receivedCount),
+                    style = MaterialTheme.typography.titleMedium,
+                )
                 OutlinedTextField(
                     value = passphrase,
                     onValueChange = { passphrase = it },
@@ -130,21 +144,27 @@ fun ImportScreen(onBack: () -> Unit) {
 
             // Крок 1: сканування кадрів із прогресом
             else -> Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-                val total = assembler.total
-                if (total != null) {
-                    LinearProgressIndicator(
-                        progress = { receivedCount.toFloat() / total },
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    )
-                    Text(
-                        text = stringResource(R.string.import_progress, receivedCount, total) +
-                            assembler.missingFrames().takeIf { it.isNotEmpty() }
+                // Блок прогресу читає стани БЕЗУМОВНО — підписка з першої композиції
+                val total = totalFrames
+                LinearProgressIndicator(
+                    progress = {
+                        if (total == null || total == 0) 0f
+                        else receivedCount.toFloat() / total
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                )
+                Text(
+                    text = if (total == null) {
+                        stringResource(R.string.import_scan_first_frame)
+                    } else {
+                        stringResource(R.string.import_progress, receivedCount, total) +
+                            missingFrames.takeIf { it.isNotEmpty() }
                                 ?.let { " • " + stringResource(R.string.import_missing_frames, it.joinToString()) }
-                                .orEmpty(),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                }
+                                .orEmpty()
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
                 error?.let {
                     Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
                 }
@@ -153,9 +173,11 @@ fun ImportScreen(onBack: () -> Unit) {
                         try {
                             error = null
                             if (assembler.accept(raw)) {
+                                // Синхронізуємо ВСІ стани з assembler
                                 receivedCount = assembler.receivedCount
-                                // Гучне підтвердження кожного кадра — прогрес
-                                // угорі легко не помітити, тримаючи два пристрої
+                                totalFrames = assembler.total
+                                missingFrames = assembler.missingFrames()
+                                allFramesReceived = assembler.isComplete
                                 Toast.makeText(
                                     context,
                                     context.getString(

@@ -23,12 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
@@ -125,15 +123,10 @@ fun ExportScreen(onBack: () -> Unit) {
                 ) { Text(stringResource(R.string.action_next)) }
             }
         } else {
-            // Крок 2: автоматична прокрутка QR-кадрів (імпортер ловить кожен
-            // кадр один раз — тримати пристрої навпроти достатньо); кнопки
-            // «Назад/Далі» лишаються для ручного дозбирання пропущених
-            LaunchedEffect(frames) {
-                while (frames.size > 1) {
-                    delay(1500)
-                    frameIndex = (frameIndex + 1) % frames.size
-                }
-            }
+            // Крок 2: ручний показ QR-кадрів — після підтвердження на
+            // імпортері («Отримано кадрів: X із N») тисніть «Далі».
+            // Автопрокрутку прибрано за результатами польового прогону:
+            // карусель збивала з пантелику і заважала навестися на кадр.
             val bitmap = remember(frameIndex) { qrBitmap(frames[frameIndex]) }
             Column(
                 modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
@@ -143,6 +136,10 @@ fun ExportScreen(onBack: () -> Unit) {
                 Text(
                     stringResource(R.string.export_frame_counter, frameIndex + 1, frames.size),
                     style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    stringResource(R.string.export_frame_hint),
+                    style = MaterialTheme.typography.bodySmall,
                 )
                 Image(
                     bitmap = bitmap.asImageBitmap(),

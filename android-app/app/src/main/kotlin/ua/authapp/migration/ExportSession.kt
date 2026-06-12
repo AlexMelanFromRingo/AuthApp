@@ -1,5 +1,8 @@
 package ua.authapp.migration
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.serialization.json.Json
 import ua.authapp.crypto.migration.FrameCodec
 import ua.authapp.crypto.migration.MigrationCrypto
@@ -9,12 +12,14 @@ import ua.authapp.storage.Token
 /**
  * Стан активного експорту (живе лише в пам'яті процесу): потрібен старому
  * пристрою для верифікації квитанції перед штатною деактивацією (FR-018).
+ * sealedPackage — snapshot-стан, щоб кнопка «Сканувати квитанцію» на
+ * MigrationScreen вмикалася рекомпозицією, а не випадково.
  */
 object ExportSession {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    var sealedPackage: SealedPackage? = null
+    var sealedPackage: SealedPackage? by mutableStateOf(null)
         private set
     private var expectedReceipt: ByteArray? = null
 

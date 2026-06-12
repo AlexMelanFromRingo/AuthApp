@@ -70,6 +70,8 @@
     <string name="export_passphrase_repeat">Повторіть парольну фразу</string>
     <string name="export_passphrase_mismatch">Парольні фрази не збігаються</string>
     <string name="export_frame_counter">Кадр %1$d із %2$d</string>
+    <string name="export_frame_hint">Кадр 1 — заголовок шифрування, решта — дані. Коли імпортер підтвердить отримання кадру, натисніть «Далі».</string>
+    <string name="import_scan_first_frame">Відскануйте будь-який кадр пакета — порядок не важливий</string>
     <string name="export_share_file">Поділитися файлом</string>
     <string name="import_title">Імпорт з іншого пристрою</string>
     <string name="import_progress">Отримано кадрів: %1$d із %2$d</string>
