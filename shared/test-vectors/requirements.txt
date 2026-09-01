@@ -1,0 +1,4 @@
+# Generated from .venv/ on 2026-09-01.
+# The complete resolved environment, Python 3.12.3 — install with:
+#     python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
+blake3==1.0.8

@@ -1,0 +1,10 @@
+# Generated from the project's virtualenv.
+# `dependencies` lists what was installed directly; the full resolved
+# set, including everything pulled in behind them, is requirements.txt.
+[project]
+name = "test-vectors"
+version = "0.0.0"
+requires-python = ">=3.12"
+dependencies = [
+    "blake3==1.0.8",
+]
